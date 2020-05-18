@@ -1,25 +1,60 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { lazy, Suspense, useState, useEffect } from "react";
+import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
-function App() {
+import "./App.css";
+import AuthContext from "./AuthContext";
+import DataContext from "./DataContext";
+
+import General from "./General";
+import Api, { GetList } from "./Api";
+
+const Supervisor = lazy(() => import("./Manager_Supervisor"));
+const Guard = lazy(() => import("./Manager_Guard"));
+const Authentication = lazy(() => import("./Authentication"));
+
+function App(props) {
+  const [auth, setAuth] = useState({});
+  const [departments, setDepartments] = useState();
+  const [locations, setLocations] = useState();
+
+  const handleSubmit = (e) => {
+    localStorage.setItem("auth", JSON.stringify(e));
+    setAuth(e);
+  };
+
+  useEffect(() => {
+    GetList("department").then((x) => setDepartments(x));
+    GetList("location").then((x) => setLocations(x));
+
+    const oldAuth = JSON.parse(localStorage.getItem("auth"));
+    if (oldAuth) {
+      setAuth(oldAuth);
+    }
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      {/* {"app render " + JSON.stringify(auth)} */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <Switch>
+          <AuthContext.Provider value={{ auth, setAuth, handleSubmit }}>
+            <General.Header />
+            {auth.type ? (
+              <Redirect to={`/${auth.type}`} />
+            ) : (
+              <Redirect to="/Login" />
+            )}
+            <DataContext.Provider
+              value={{ departments: departments, locations: locations }}
+            >
+              <Route exact path="/Login" component={Authentication} />
+              <Route exact path="/Supervisor" component={Supervisor} />
+              <Route exact path="/Guard" component={Guard} />
+            </DataContext.Provider>
+          </AuthContext.Provider>
+        </Switch>
+      </Suspense>
+    </BrowserRouter>
   );
 }
 
