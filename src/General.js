@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Navbar, NavDropdown, Collapse, Button, Form } from "react-bootstrap";
 
-import Util from "./Util";
-import API from "./Api";
+import * as Util from "./Util";
+import * as API from "./Api/Api";
 
-import AuthContext from "./AuthContext";
-import DataContext from "./DataContext";
+import AuthContext from "./Contexts/AuthContext";
+import DataContext from "./Contexts/DataContext";
 
 function Filter(props) {
   const { auth } = useContext(AuthContext);
@@ -22,13 +22,6 @@ function Filter(props) {
       const interval = setInterval(() => {
         console.log("nag filter");
         API.requestFilter(filter).then((x) => {
-          // const log = props.logs ? props.logs[0] : { id: 'na', logs: [], employees: [] };
-          // const xlog = x[0];
-
-          // if (log.id !== xlog.id ||
-          //     log.logs.length !== xlog.logs.length ||
-          //     log.employees.length !== xlog.employees.length) {
-
           props.setLog({ logs: x, isLoading: false });
           // }
         });
@@ -57,8 +50,8 @@ function Filter(props) {
             <Form.Row>
               <Util.Text
                 placeholder="Supervisor ID"
-                name="id"
-                value={filter.id}
+                name="username"
+                value={filter.username}
                 onChange={(e) => handleChange(e)}
               />
               <Util.Select
@@ -89,8 +82,8 @@ function Header(props) {
       <Navbar.Brand>Online Floor Pass</Navbar.Brand>
       {props.children}
 
-      {auth.name ? (
-        <NavDropdown className="ml-auto" title={auth.name}>
+      {auth.username ? (
+        <NavDropdown className="ml-auto" title={auth.username}>
           <NavDropdown.Item
             onClick={() => {
               localStorage.removeItem("auth");

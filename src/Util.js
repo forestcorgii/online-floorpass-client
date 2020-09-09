@@ -5,7 +5,7 @@ function fillNumber(nm) {
   return nm < 10 ? "0" + nm : nm;
 }
 
-function formatTime(date) {
+export function formatTime(date) {
   const day = date.getDate();
   const month = date.getMonth();
   const year = date.getFullYear();
@@ -30,11 +30,11 @@ function formatTime(date) {
 
 // function ValidateName()
 
-function ParseName(raw) {
+export function ParseName(raw) {
   return `${raw.last_name}, ${raw.first_name}`;
 }
 
-function Text(props) {
+export function Text(props) {
   return (
     <Form.Group as={Col} style={props.style}>
       {props.label ? <Form.Label>{props.label}</Form.Label> : null}
@@ -54,7 +54,7 @@ function Text(props) {
   );
 }
 
-function Select(props) {
+export function Select(props) {
   return (
     <Form.Group as={Col}>
       {props.label ? <Form.Label>{props.label}</Form.Label> : null}
@@ -86,7 +86,7 @@ function Select(props) {
   );
 }
 
-function ModalField(props) {
+export function ModalField(props) {
   // console.log(props);
   return (
     <Modal show={props.show} onHide={() => props.onExit()}>
@@ -117,7 +117,7 @@ function ModalField(props) {
   );
 }
 
-function Log(props) {
+export function Log(props) {
   return (
     <div>
       {!props.data.isLoading && props.data.logs && props.headerInfo ? (
@@ -165,4 +165,8 @@ function Log(props) {
   );
 }
 
-export default { formatTime, Log, Select, Text, ModalField, ParseName };
+// export function ListField({as, ...props}){
+//   const L = as;
+
+//   return ({})
+// }

@@ -2,15 +2,15 @@ import React, { lazy, Suspense, useState, useEffect } from "react";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import "./App.css";
-import AuthContext from "./AuthContext";
-import DataContext from "./DataContext";
+import AuthContext from "./Contexts/AuthContext";
+import DataContext from "./Contexts/DataContext";
 
 import General from "./General";
-import Api, { GetList } from "./Api";
+import  { GetList } from "./Api/Api";
 
-const Supervisor = lazy(() => import("./Manager_Supervisor"));
-const Guard = lazy(() => import("./Manager_Guard"));
-const Authentication = lazy(() => import("./Authentication"));
+const Supervisor = lazy(() => import("./Manager/Supervisor/Supervisor"));
+const Guard = lazy(() => import("./Manager/Guard/Guard"));
+const Authentication = lazy(() => import("./Authentication/Login"));
 
 function App(props) {
   const [auth, setAuth] = useState({});

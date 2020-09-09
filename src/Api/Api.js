@@ -14,10 +14,10 @@ export async function GetList(field) {
   return data;
 }
 
-async function requestFilter(obj) {
+export async function requestFilter(obj) {
   const response = await fetch(
-    "http://127.0.0.1:8000/filter/?software_id=" +
-      obj.software_id +
+    "http://127.0.0.1:8000/filter/?username=" +
+      obj.username +
       "&department=" +
       (obj.department ? obj.department : "") +
       "&location=" +
@@ -31,7 +31,7 @@ async function requestFilter(obj) {
   return await response.json();
 }
 
-async function FindName(id) {
+export async function FindName(id) {
   var myHeaders = new Headers();
   myHeaders.append("Allow-Control-Allow-Origin", "*");
 
@@ -59,7 +59,7 @@ async function FindName(id) {
   return data;
 }
 
-async function createEmployee(obj) {
+export async function createEmployee(obj) {
   var myHeaders = new Headers();
   myHeaders.append("Accept", "application/json");
   myHeaders.append(
@@ -83,7 +83,7 @@ async function createEmployee(obj) {
   return await response.json();
 }
 
-async function updateEmployee(obj, method) {
+export async function updateEmployee(obj, method) {
   // console.log(method + JSON.stringify(obj));
   var myHeaders = new Headers();
   myHeaders.append(
@@ -116,34 +116,35 @@ async function updateEmployee(obj, method) {
     console.log("error", error)
   );
 
-  const data = await response.json();
-  console.log(data);
-  return data;
+  // const data = await response.json();
+  // console.log(data);
+  // return data;
 }
 
-async function createLog(obj) {
+export async function createLog(obj) {
   var formdata = new FormData();
   formdata.append("guard_id", obj.id);
   formdata.append("location", obj.location);
-  formdata.append("floorpass", obj.floopass_idj);
+  formdata.append("floorpass", obj.floorpass_id);
 
+  console.log(obj);
   var requestOptions = {
     method: "POST",
     body: formdata,
     redirect: "follow",
   };
 
-  const response = fetch(
+  const response = await fetch(
     "http://localhost:8000/log/",
     requestOptions
-  ).catch((error) => console.log("error", error));
+  ).catch((error) => alert("error", error));
 
   const data = await response.json();
   console.log(data);
   return data;
 }
 
-async function createID(obj) {
+export async function createID(obj) {
   var myHeaders = new Headers();
   myHeaders.append("Accept", "application/json");
   myHeaders.append(
@@ -172,11 +173,19 @@ async function createID(obj) {
   return await response.json();
 }
 
-export default {
-  requestFilter,
-  FindName,
-  createEmployee,
-  createLog,
-  createID,
-  updateEmployee,
-};
+export function loginToHRMS(username, password) {
+  var formdata = new FormData();
+  formdata.append("username", username);
+  formdata.append("password", password);
+
+  var requestOptions = {
+    method: "POST",
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(
+    "http://idcsi-officesuites.com:8080/hrms/sso.php",
+    requestOptions
+  );
+}
