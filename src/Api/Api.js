@@ -5,7 +5,7 @@ export async function GetList(field) {
   };
 
   const response = await fetch(
-    `http://localhost:8000/list/?type=${field}`,
+    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/list/?type=${field}`,
     requestOptions
   );
 
@@ -16,16 +16,16 @@ export async function GetList(field) {
 
 export async function requestFilter(obj) {
   const response = await fetch(
-    "http://127.0.0.1:8000/filter/?username=" +
-      obj.username +
-      "&department=" +
-      (obj.department ? obj.department : "") +
-      "&location=" +
-      (obj.location ? obj.location : "") +
-      "&sort=" +
-      (obj.sort ? obj.sort : "-latest_log_date") +
-      "&limit=" +
-      (obj.limit ? obj.limit : "100")
+    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/filter/?username=` +
+    obj.username +
+    "&department=" +
+    (obj.department ? obj.department : "") +
+    "&location=" +
+    (obj.location ? obj.location : "") +
+    "&sort=" +
+    (obj.sort ? obj.sort : "-latest_log_date") +
+    "&limit=" +
+    (obj.limit ? obj.limit : "100")
   );
 
   return await response.json();
@@ -79,7 +79,7 @@ export async function createEmployee(obj) {
     redirect: "follow",
   };
 
-  const response = await fetch("http://127.0.0.1:8000/user/", requestOptions);
+  const response = await fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/user/`, requestOptions);
   return await response.json();
 }
 
@@ -108,7 +108,7 @@ export async function updateEmployee(obj, method) {
   };
 
   var url =
-    "http://127.0.0.1:8000/user" + (method === "POST" ? "/" : `/${obj.id}/`);
+    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/user` + (method === "POST" ? "/" : `/${obj.id}/`);
 
   // console.log(url)
 
@@ -135,7 +135,7 @@ export async function createLog(obj) {
   };
 
   const response = await fetch(
-    "http://localhost:8000/log/",
+    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/log/`,
     requestOptions
   ).catch((error) => alert("error", error));
 
@@ -167,7 +167,7 @@ export async function createID(obj) {
   };
 
   const response = await fetch(
-    "http://127.0.0.1:8000/floorpass/",
+    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/floorpass/`,
     requestOptions
   ).catch((error) => console.log("error", error));
   return await response.json();

@@ -18,12 +18,12 @@ function App(props) {
   const [locations, setLocations] = useState();
 
   const handleSubmit = (e) => {
-    alert(JSON.stringify(e));
     localStorage.setItem("auth", JSON.stringify(e));
     setAuth(e);
   };
 
   useEffect(() => {
+
     GetList("department").then((x) => setDepartments(x));
     GetList("location").then((x) => setLocations(x));
 
@@ -43,8 +43,8 @@ function App(props) {
             {auth.type ? (
               <Redirect to={`/${auth.type}`} />
             ) : (
-              <Redirect to="/Login" />
-            )}
+                <Redirect to="/Login" />
+              )}
             <DataContext.Provider
               value={{ departments: departments, locations: locations }}
             >

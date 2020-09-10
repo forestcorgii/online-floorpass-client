@@ -79,8 +79,8 @@ export function Select(props) {
             );
           })
         ) : (
-          <option value={"No " + props.name}>No {props.name}</option>
-        )}
+            <option value={"No " + props.name}>No {props.name}</option>
+          )}
       </Form.Control>
     </Form.Group>
   );
@@ -118,6 +118,7 @@ export function ModalField(props) {
 }
 
 export function Log(props) {
+
   return (
     <div>
       {!props.data.isLoading && props.data.logs && props.headerInfo ? (
@@ -143,12 +144,13 @@ export function Log(props) {
                       <td key={props.name + i + j}>
                         {subHeader && item[header]
                           ? item[header].reverse().map((sItem, k) => {
-                              return (
-                                <p key={props.name + i + j + k}>
-                                  {sItem[subHeader]}
-                                </p>
-                              );
-                            })
+
+                            return (
+                              <p key={props.name + i + j + k}>
+                                {sItem[subHeader]}
+                              </p>
+                            );
+                          })
                           : item[header]}
                       </td>
                     );
@@ -159,8 +161,8 @@ export function Log(props) {
           </tbody>
         </Table>
       ) : (
-        <p>loading...</p>
-      )}
+          <p>loading...</p>
+        )}
     </div>
   );
 }

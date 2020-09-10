@@ -24,7 +24,7 @@ export default function Guard(props) {
       "Purpose",
       "Status",
     ],
-    subHeaders: { logs: "logdatetime", employees: "employee_name" },
+    subHeaders: { logs: "logdatetime_str", employees: "employee_name" },
   };
 
   const [state, setState] = useState({ logs: null, isLoading: true });

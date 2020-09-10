@@ -12,7 +12,7 @@ function Filter(props) {
   const data = useContext(DataContext);
 
   const [filter, setFilter] = useState(auth);
-  const [collapse, setCollapse] = useState(false);
+  // const [collapse, setCollapse] = useState(false);
   const handleChange = (e) => {
     setFilter({ ...filter, [e.target.name]: e.target.value });
   };
@@ -35,40 +35,40 @@ function Filter(props) {
       <Form>
         <Form.Row inline="true">
           {props.children}
-          <Button
+          {/* <Button
             className="ml-auto m-2"
             size="sm"
             aria-controls="example-collapse-text"
             aria-expanded={collapse}
-            onClick={() => setCollapse(!collapse)}
+          // onClick={() => setCollapse(!collapse)}
           >
             Filter
-          </Button>
+          </Button> */}
         </Form.Row>
-        <Collapse in={collapse}>
-          <div id="example-collapse-text">
-            <Form.Row>
-              <Util.Text
-                placeholder="Supervisor ID"
-                name="username"
-                value={filter.username}
-                onChange={(e) => handleChange(e)}
-              />
-              <Util.Select
-                name="department"
-                default={filter.department}
-                options={data.departments}
-                onChange={(e) => handleChange(e)}
-              />
-              <Util.Select
-                name="location"
-                default={filter.location}
-                options={data.locations}
-                onChange={(e) => handleChange(e)}
-              />
-            </Form.Row>
-          </div>
-        </Collapse>
+        {/* <Collapse in={collapse}> */}
+        <div id="example-collapse-text">
+          <Form.Row>
+            <Util.Text
+              placeholder="Supervisor ID"
+              name="username"
+              value={filter.username}
+              onChange={(e) => handleChange(e)}
+            />
+            <Util.Select
+              name="department"
+              default={filter.department}
+              options={data.departments}
+              onChange={(e) => handleChange(e)}
+            />
+            <Util.Select
+              name="location"
+              default={filter.location}
+              options={data.locations}
+              onChange={(e) => handleChange(e)}
+            />
+          </Form.Row>
+        </div>
+        {/* </Collapse> */}
       </Form>
     </div>
   );
@@ -83,7 +83,7 @@ function Header(props) {
       {props.children}
 
       {auth.username ? (
-        <NavDropdown className="ml-auto" title={auth.username}>
+        <NavDropdown className="ml-auto" title={auth.name}>
           <NavDropdown.Item
             onClick={() => {
               localStorage.removeItem("auth");
