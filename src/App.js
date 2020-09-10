@@ -6,7 +6,7 @@ import AuthContext from "./Contexts/AuthContext";
 import DataContext from "./Contexts/DataContext";
 
 import General from "./General";
-import  { GetList } from "./Api/Api";
+import { GetList } from "./Api/Api";
 
 const Supervisor = lazy(() => import("./Manager/Supervisor/Supervisor"));
 const Guard = lazy(() => import("./Manager/Guard/Guard"));
@@ -18,6 +18,7 @@ function App(props) {
   const [locations, setLocations] = useState();
 
   const handleSubmit = (e) => {
+    alert(JSON.stringify(e));
     localStorage.setItem("auth", JSON.stringify(e));
     setAuth(e);
   };

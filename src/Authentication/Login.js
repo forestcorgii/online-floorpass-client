@@ -46,7 +46,11 @@ function Authentication(props) {
           .then((res) => {
             // if (res.code === 0 && res.message.userpower > 0) {
             if (res.code === 0) {
-              handleSubmit(values);
+              handleSubmit({
+                id: res.message.username,
+                name: res.message.fullname,
+                ...values,
+              });
               props.history.push(`/${values.type}`);
             } else {
               setErrormsg("You don't have the right to login.");
