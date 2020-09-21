@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import * as RCBTRP from "react-bootstrap";
 import { Formik, Form } from "formik";
 
@@ -22,16 +22,19 @@ import world from "../world.png";
 function Authentication(props) {
   const { handleSubmit } = useContext(AuthContext);
   const data = useContext(DataContext);
-
+  const [location, setLocation] = useState({});
   const [errormsg, setErrormsg] = useState("");
-  return (
+
+  return data.locations ? (
     <Formik
+      enableReinitialize
       initialValues={{
         password: "",
         username: "",
         type: "Supervisor",
         department: "",
         location: "",
+        locations: [...data.locations],
       }}
       validationSchema={Yup.object().shape({
         username: Schema.basic,
@@ -59,11 +62,11 @@ function Authentication(props) {
           .catch((error) => alert(error));
       }}
     >
-      {({ values }) => (
+      {({ values, handleChange }) => (
         <div>
           <RCBTRP.Card
             style={{
-              width: "24rem",
+              width: "20rem",
               padding: "15px",
               margin: "auto",
               marginTop: "50px",
@@ -72,7 +75,7 @@ function Authentication(props) {
             <Form>
               <RCBTRP.Row>
                 <RCBTRP.Col>
-                  <img src={world} width="350" height="275" />
+                  <img src={world} width="100%" height="auto" />
                 </RCBTRP.Col>
               </RCBTRP.Row>
               {errormsg ? (
@@ -84,7 +87,7 @@ function Authentication(props) {
                 </div>
               ) : null}
               <RCBTRP.Row
-                className="justify-content-md-center mb-3"
+                className="justify-content-center mb-3"
                 style={{ marginTop: "15px" }}
               >
                 <RCBTRP.Col xs lg="4">
@@ -126,6 +129,24 @@ function Authentication(props) {
               </RCBTRP.Row>
               <RCBTRP.Row>
                 <RCBTRP.Col>
+                  <label>Location:</label>
+                  <Select
+                    size="sm"
+                    className="mb-1"
+                    name="location"
+                    label="Location"
+                    onChange={(e) => {
+                      setLocation(
+                        data.locations.find((el) => el.name === e.target.value)
+                      );
+                      handleChange(e);
+                    }}
+                    options={values.locations}
+                  />
+                </RCBTRP.Col>
+              </RCBTRP.Row>
+              <RCBTRP.Row>
+                <RCBTRP.Col>
                   {values.type === "Supervisor" ? (
                     <>
                       <label>Department:</label>
@@ -134,22 +155,10 @@ function Authentication(props) {
                         className="mb-1"
                         name="department"
                         label="Department"
-                        options={data.departments}
+                        options={location ? location.departments : []}
                       />
                     </>
                   ) : null}
-                </RCBTRP.Col>
-              </RCBTRP.Row>
-              <RCBTRP.Row>
-                <RCBTRP.Col>
-                  <label>Location:</label>
-                  <Select
-                    size="sm"
-                    className="mb-1"
-                    name="location"
-                    label="Location"
-                    options={data.locations}
-                  />
                 </RCBTRP.Col>
               </RCBTRP.Row>
               <RCBTRP.Row>
@@ -164,6 +173,8 @@ function Authentication(props) {
         </div>
       )}
     </Formik>
+  ) : (
+    <div>luding</div>
   );
 }
 

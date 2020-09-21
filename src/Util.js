@@ -36,33 +36,38 @@ export function ParseName(raw) {
 
 export function Text(props) {
   return (
-    <Form.Group as={Col} style={props.style}>
-      {props.label ? <Form.Label>{props.label}</Form.Label> : null}
-      <Form.Control
-        size="sm"
+    <div className={"input-group input-group-sm mw-100 " + props.className}>
+      {props.label ? (
+        <div className="input-group-prepend">
+          <label className="input-group-text">{props.label}</label>
+        </div>
+      ) : null}
+      <input
+        className="input-field form-control form-control-sm"
         type={props.type}
-        as={props.as}
+        // as={props.as}
         name={props.name}
         placeholder={props.placeholder}
         value={props.value}
         onChange={(e) => props.onChange(e)}
-      ></Form.Control>
-      {props.label ? (
-        <Form.Text className="text-muted">{props.message}</Form.Text>
-      ) : null}
-    </Form.Group>
+      />
+    </div>
   );
 }
 
 export function Select(props) {
   return (
-    <Form.Group as={Col}>
-      {props.label ? <Form.Label>{props.label}</Form.Label> : null}
-      <Form.Control
-        as="select"
-        size="sm"
+    <div className={"input-group input-group-sm mw-100 " + props.className}>
+      {props.label ? (
+        <div className="input-group-prepend">
+          <label className="input-group-text">{props.label}</label>
+        </div>
+      ) : null}
+      <select
+        className="input-field custom-select custom-select-sm"
         name={props.name}
         defaultValue={props.default}
+        value={props.default}
         onChange={(e) => props.onChange(e)}
         custom
       >
@@ -70,24 +75,20 @@ export function Select(props) {
         {props.options ? (
           props.options.map((item) => {
             return (
-              <option
-                key={props.componentName + item.name}
-                value={item.name.toUpperCase()}
-              >
-                {item.name.toUpperCase()}
+              <option key={props.componentName + item.name} value={item.name}>
+                {item.name}
               </option>
             );
           })
         ) : (
-            <option value={"No " + props.name}>No {props.name}</option>
-          )}
-      </Form.Control>
-    </Form.Group>
+          <option value={"No " + props.name}>No {props.name}</option>
+        )}
+      </select>
+    </div>
   );
 }
 
 export function ModalField(props) {
-  // console.log(props);
   return (
     <Modal show={props.show} onHide={() => props.onExit()}>
       <Modal.Header>{props.header}</Modal.Header>
@@ -118,12 +119,11 @@ export function ModalField(props) {
 }
 
 export function Log(props) {
-
   return (
-    <div>
+    <div className="table-responsive">
       {!props.data.isLoading && props.data.logs && props.headerInfo ? (
-        <Table size="sm" bordered hover>
-          <thead>
+        <table className="table table-hover table-bordered">
+          <thead className="table-light">
             <tr>
               {props.headerInfo.headers.map((header) => {
                 return <th key={props.name + header}>{header}</th>;
@@ -134,6 +134,7 @@ export function Log(props) {
             {props.data.logs.map((item, i) => {
               return (
                 <tr
+                  className="table-light"
                   key={props.name + i}
                   onClick={props.onClick ? () => props.onClick(item) : null}
                 >
@@ -144,13 +145,12 @@ export function Log(props) {
                       <td key={props.name + i + j}>
                         {subHeader && item[header]
                           ? item[header].reverse().map((sItem, k) => {
-
-                            return (
-                              <p key={props.name + i + j + k}>
-                                {sItem[subHeader]}
-                              </p>
-                            );
-                          })
+                              return (
+                                <p key={props.name + i + j + k}>
+                                  {sItem[subHeader]}
+                                </p>
+                              );
+                            })
                           : item[header]}
                       </td>
                     );
@@ -159,10 +159,10 @@ export function Log(props) {
               );
             })}
           </tbody>
-        </Table>
+        </table>
       ) : (
-          <p>loading...</p>
-        )}
+        <p>loading...</p>
+      )}
     </div>
   );
 }

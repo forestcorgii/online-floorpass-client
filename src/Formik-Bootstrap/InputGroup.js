@@ -1,14 +1,13 @@
 import React, { useRef } from "react";
 import { useField } from "formik";
-import { Form,  InputGroup, Button } from "react-bootstrap";
-import Tooltip from "./Tooltip"
-export default function MyInputGroup ({
+import { Form, InputGroup, Button } from "react-bootstrap";
+import Tooltip from "./Tooltip";
+export default function MyInputGroup({
   label,
   normalButton,
   toggleButton,
   ...props
 }) {
-
   const [fields, meta] = useField(props);
 
   const disabled =
@@ -34,7 +33,7 @@ export default function MyInputGroup ({
 
   const normal = normalButton ? (
     <InputGroup.Append>
-      <Button onClick={() => props.onClick()}>{normalButton}</Button>
+      <Button onClick={() => props.onButtonClick()}>{normalButton}</Button>
     </InputGroup.Append>
   ) : null;
   return (
@@ -63,4 +62,4 @@ export default function MyInputGroup ({
       />
     </>
   );
-};
+}

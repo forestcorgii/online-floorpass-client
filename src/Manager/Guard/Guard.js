@@ -16,13 +16,13 @@ export default function Guard(props) {
   const headerInfo = {
     headers: [
       "ID",
-      "Supervisor",
+      "Supervisor_ID",
       "Employees",
       "Location",
       "Department",
       "Logs",
       "Purpose",
-      "Status",
+      "Status_label",
     ],
     subHeaders: { logs: "logdatetime_str", employees: "employee_name" },
   };
@@ -35,55 +35,52 @@ export default function Guard(props) {
 
   const LogSchema = Yup.object().shape({
     ReferenceID: Yup.string().required("required"),
-    // .length(1, 'Invalid')
   });
-
-  // const handleSubmit =
-  //     async () => {
-  //     }
 
   return (
     <div>
-      <General.Filter logs={state.logs} setLog={setState}>
+      <General.Filter
+        logs={state.logs}
+        setLog={setState}
+        headerInfo={headerInfo}
+        showFilter={false}
+      >
         <Formik
           initialValues={{
             ReferenceID: "",
           }}
           validationSchema={LogSchema}
-          onSubmit={(values) => {
-            // console.log(values)
+          onSubmit={(values, { resetForm }) => {
             API.createLog({
               id: auth.id,
               floorpass_id: parseInt(values.ReferenceID),
               location: auth.location,
             });
+            resetForm({});
           }}
         >
           {({ values, errors, touched }) => (
             <Form>
-              <Field name="ReferenceID" />
-              {errors.ReferenceID && touched.ReferenceID ? (
-                <div>{errors.ReferenceID}</div>
-              ) : null}
-              <Button type="submit">Log</Button>
+              <div className="input-group input-group-sm mw-100 p-1 col-sm-12 col-md-3 col-lg-3">
+                <Field
+                  className="input-field form-control form-control-sm"
+                  name="ReferenceID"
+                  placeholder="Enter Reference ID"
+                />
+                <div className="input-group-append">
+                  <Button
+                    className="input-group-button button-sm"
+                    type="submit"
+                  >
+                    Log
+                  </Button>
+                </div>
+              </div>
             </Form>
           )}
         </Formik>
-
-        {/* <Form onSubmit={() => handleSubmit()}>
-                    <Form.Row>
-                        <Util.Text
-                            name="referenceID"
-                            placeholder="Reference ID"
-                            onChange={e => setReferenceID(e.target.value)}
-                        />
-                        <Col>
-                            <Button size="sm" type="submit">Log</Button>
-                        </Col>
-                    </Form.Row>
-                </Form> */}
       </General.Filter>
-      <Util.Log name="log" headerInfo={headerInfo} data={state} />
+      {/* <Util.Log name="log" headerInfo={headerInfo} data={state} /> */}
     </div>
   );
 }

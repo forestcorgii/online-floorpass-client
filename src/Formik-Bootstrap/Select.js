@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import { useField } from "formik";
 import { Form, Overlay, Tooltip } from "react-bootstrap";
 
-
 export default function Select({ options, label, ...props }) {
   const [fields, meta] = useField(props);
   const target = useRef(props);
@@ -25,17 +24,14 @@ export default function Select({ options, label, ...props }) {
           options.map((item) => {
             // console.log(item);
             return (
-              <option
-                key={label.componentName + item.name}
-                value={item.name}
-              >
+              <option key={label.componentName + item.name} value={item.name}>
                 {item.name}
               </option>
             );
           })
         ) : (
-            <option value={"No " + props.name}>No {props.name}</option>
-          )}
+          <option value={"No " + props.name}>No {props.name}</option>
+        )}
       </Form.Control>
       <Overlay target={target.current} show={isInvalid} placement="right">
         {(props) => (
@@ -46,4 +42,4 @@ export default function Select({ options, label, ...props }) {
       </Overlay>
     </>
   );
-};
+}

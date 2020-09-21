@@ -22,11 +22,16 @@ function App(props) {
     setAuth(e);
   };
 
+  const getList = async () => {
+    await GetList("location").then((x) => {
+      console.log(x);
+      setLocations(x);
+    });
+  };
+
   useEffect(() => {
-
-    GetList("department").then((x) => setDepartments(x));
-    GetList("location").then((x) => setLocations(x));
-
+    // GetList("department").then((x) => setDepartments(x));
+    getList();
     const oldAuth = JSON.parse(localStorage.getItem("auth"));
     if (oldAuth) {
       setAuth(oldAuth);
@@ -43,8 +48,8 @@ function App(props) {
             {auth.type ? (
               <Redirect to={`/${auth.type}`} />
             ) : (
-                <Redirect to="/Login" />
-              )}
+              <Redirect to="/Login" />
+            )}
             <DataContext.Provider
               value={{ departments: departments, locations: locations }}
             >

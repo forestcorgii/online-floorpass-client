@@ -17,15 +17,17 @@ export async function GetList(field) {
 export async function requestFilter(obj) {
   const response = await fetch(
     `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/filter/?username=` +
-    obj.username +
-    "&department=" +
-    (obj.department ? obj.department : "") +
-    "&location=" +
-    (obj.location ? obj.location : "") +
-    "&sort=" +
-    (obj.sort ? obj.sort : "-latest_log_date") +
-    "&limit=" +
-    (obj.limit ? obj.limit : "100")
+      obj.username +
+      "&department=" +
+      (obj.department ? obj.department : "") +
+      "&location=" +
+      (obj.location ? obj.location : "") +
+      "&sort=" +
+      (obj.sort ? obj.sort : "-latest_log_date") +
+      "&limit=" +
+      (obj.limit ? obj.limit : "100") +
+      "&page=" +
+      (obj.limit ? obj.page : "1")
   );
 
   return await response.json();
@@ -79,7 +81,10 @@ export async function createEmployee(obj) {
     redirect: "follow",
   };
 
-  const response = await fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/user/`, requestOptions);
+  const response = await fetch(
+    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/user/`,
+    requestOptions
+  );
   return await response.json();
 }
 
@@ -108,7 +113,8 @@ export async function updateEmployee(obj, method) {
   };
 
   var url =
-    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/user` + (method === "POST" ? "/" : `/${obj.id}/`);
+    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/user` +
+    (method === "POST" ? "/" : `/${obj.id}/`);
 
   // console.log(url)
 
@@ -159,6 +165,14 @@ export async function createID(obj) {
   formdata.append("supervisor_id", obj.supervisorId);
   formdata.append("supervisor_name", obj.supervisorName);
 
+  let employees = "";
+  obj.employees.forEach((e) => {
+    if (e.employee_id && e.employee_id !== "") {
+      employees = employees + `${e.employee_id}|${e.employee_name};`;
+    }
+  });
+  console.log(obj);
+  formdata.append("employees", employees);
   var requestOptions = {
     method: "POST",
     headers: myHeaders,
@@ -166,11 +180,28 @@ export async function createID(obj) {
     redirect: "follow",
   };
 
+  const floorpassId = obj.floorpass ? obj.floorpass + "/" : "";
   const response = await fetch(
-    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/floorpass/`,
+    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/floorpass/${floorpassId}`,
     requestOptions
   ).catch((error) => console.log("error", error));
   return await response.json();
+}
+
+export async function checkNewLog(obj) {
+  var requestOptions = {
+    method: "GET",
+    redirect: "follow",
+  };
+
+  await fetch(
+    `http://localhost:8000/check_log/?username=` + obj.username ||
+      "" + "&department=" + obj.department ||
+      "" + "&location=" + obj.location ||
+      "" + "&latest_log_date=" + obj.latest_log_date ||
+      "",
+    requestOptions
+  ).then((response) => response.json());
 }
 
 export function loginToHRMS(username, password) {

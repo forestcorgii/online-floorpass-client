@@ -11,14 +11,8 @@ import DataContext from "../../Contexts/DataContext";
 import UpdateFloorpass from "./UpdateFloorpass";
 import MakeID from "./MakeID";
 
-// const initialEmployeeProps = {
-//   id: "",
-//   employee_id: "",
-//   employee_name: "",
-//   floorpass: "",
-// };
 const initialReferenceID = {
-  id: "",
+  floorpassId: "",
   supervisorName: "",
   supervisorId: "",
   department: "",
@@ -39,14 +33,13 @@ export default function Supervisor(props) {
       "Department",
       "Logs",
       "Purpose",
-      "Status",
+      "Status_label",
     ],
     subHeaders: { logs: "logdatetime_str", employees: "employee_name" },
   };
 
   const [state, setState] = useState({ logs: null, isLoading: true });
   const [showModalMakeID, setShowModalMakeID] = useState(false);
-  const [showModalUpdateID, setShowModalUpdateID] = useState(false);
   const [selectedReferenceID, setSelectedReferenceID] = useState(
     initialReferenceID
   );
@@ -59,66 +52,45 @@ export default function Supervisor(props) {
     setSelectedReferenceID(initialReferenceID);
   };
 
-  const handleUpdateLogSubmit = (p) => {
-    setShowModalUpdateID(false);
-    setSelectedReferenceID(initialReferenceID);
-
-    if (p) {
-      const emps = p.slice();
-      emps.forEach((emp) => {
-        if (emp.changeType) {
-          API.updateEmployee(emp, emp.changeType);
-        }
-      });
-    }
-  };
-
   return (
     <div>
-      {/* <Formikform></Formikform> */}
-
-      {/* {JSON.stringify(props)} */}
       <MakeID
         show={showModalMakeID}
-        auth={auth}
+        detail={{ ...selectedReferenceID, ...auth }}
         departments={data.departments}
         locations={data.locations}
         onSubmit={(p) => handleMakeFormSubmit(p)}
-      />
-      <UpdateFloorpass
-        show={showModalUpdateID}
-        // referenceID={selectedReferenceID}
-        id={selectedReferenceID.id}
-        employees={selectedReferenceID.employees}
-        onSubmit={(p) => handleUpdateLogSubmit(p)}
       />
 
       <General.Filter
         logs={state.logs}
         setLog={setState}
-        isEditting={showModalUpdateID}
+        isEditting={showModalMakeID}
+        headerInfo={headerInfo}
+        showFilter={true}
+        onClick={(e) => {
+          setSelectedReferenceID({ floorpassId: e.id, ...e });
+          setShowModalMakeID(true);
+        }}
       >
-        <Button
-          variant="outline-info"
-          size="sm"
-          className="m-2"
-          onClick={() => setShowModalMakeID(true)}
-        >
-          Generate ID
-        </Button>
+        <div className="mw-100 p-1 col-sm-12 col-md-3 col-lg-3">
+          <Button size="sm" onClick={() => setShowModalMakeID(true)}>
+            Generate ID
+          </Button>
+        </div>
       </General.Filter>
 
-      <Util.Log
-        name="log"
-        headerInfo={headerInfo}
-        data={state}
-        onClick={(e) => {
-          // console.log(e)
-          setSelectedReferenceID({ ...e });
-          setShowModalUpdateID(true);
-        }}
-      />
+      {/* <div style={{ margin: "5px" }}>
+        <Util.Log
+          name="log"
+          headerInfo={headerInfo}
+          data={state}
+          onClick={(e) => {
+            setSelectedReferenceID({ floorpassId: e.id, ...e });
+            setShowModalMakeID(true);
+          }}
+        />
+      </div> */}
     </div>
   );
 }
-
