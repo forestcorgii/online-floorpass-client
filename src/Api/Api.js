@@ -194,14 +194,19 @@ export async function checkNewLog(obj) {
     redirect: "follow",
   };
 
-  await fetch(
-    `http://localhost:8000/check_log/?username=` + obj.username ||
-      "" + "&department=" + obj.department ||
-      "" + "&location=" + obj.location ||
-      "" + "&latest_log_date=" + obj.latest_log_date ||
-      "",
+  return await fetch(
+    `http://localhost:8000/check_log/?username=` +
+      (obj.supervisor_id ? obj.supervisor_id : "") +
+      "&department=" +
+      (obj.department ? obj.department : "") +
+      "&location=" +
+      (obj.location ? obj.location : "") +
+      "&latest_log_date=" +
+      (obj.latest_log_date ? obj.latest_log_date : ""),
     requestOptions
-  ).then((response) => response.json());
+  ).then((response) => {
+    return response.json();
+  });
 }
 
 export function loginToHRMS(username, password) {

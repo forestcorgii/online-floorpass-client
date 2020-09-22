@@ -12,26 +12,18 @@ import { findByLabelText } from "@testing-library/react";
 function filterReducer(state, action) {
   switch (action.type) {
     case "set-filter":
-      console.log(action.logs);
+      const logCount = action.logs.length;
+      var latestLog = {};
+      if (logCount > 0) {
+        latestLog = action.logs[0];
+      }
       return {
         ...state,
         ...action.filter,
         result: action.logs,
         maxPageCount: action.maxPageCount,
         isLoading: false,
-      };
-    case "set-result":
-      const logCount = action.logs.length;
-      const latestLog = {};
-      if (logCount > 0) {
-        latestLog = action.logs[0];
-      }
-      return {
-        ...state,
-        result: action.logs,
-        isLoading: false,
         latestLog: latestLog,
-        logCount: logCount,
       };
   }
 }
@@ -44,7 +36,7 @@ function Filter(props) {
   const [filter, dispatch] = useReducer(filterReducer, {
     ...auth,
     page: 1,
-    limit: 5,
+    limit: 15,
   });
   const handleChange = (obj) => {
     const newFilter = { ...filter, ...obj };
@@ -65,22 +57,21 @@ function Filter(props) {
     handleChange();
   }, []);
 
-  // useEffect(() => {
-  //   if (!props.isEditting) {
-  //     const interval = setInterval(() => {
-  //       console.log(filter);
-  //       // API.checkNewLog(filter.latestLog).then((x) => {
-  //       // props.setLog({ logs: x.logs, isLoading: false });
-  //       // }
-  //       // });
-  //     }, 5000);
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [filter, props]);
+  useEffect(() => {
+    if (!props.isEditting) {
+      const interval = setInterval(() => {
+        API.checkNewLog(filter.latestLog).then((x) => {
+          if (x.new_logs_count > 0) {
+            handleChange();
+          }
+        });
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [filter]);
 
   return (
     <div>
-      {/* {JSON.stringify(departments)} */}
       <Form>
         <div className="row m-1">
           {props.children}
@@ -149,6 +140,7 @@ function Filter(props) {
             onClick={(e) => {
               if (props.onClick) {
                 props.onClick(e);
+                handleChange();
               }
             }}
           />
@@ -172,6 +164,7 @@ function Filter(props) {
                 .map((o, i) => {
                   return (
                     <li
+                      key={"pages" + i}
                       style={{ cursor: "pointer" }}
                       className={
                         "page-item " + (filter.page === i + 1 ? "active" : "")

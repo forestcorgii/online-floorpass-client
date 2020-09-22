@@ -134,6 +134,7 @@ export function Log(props) {
             {props.data.logs.map((item, i) => {
               return (
                 <tr
+                  style={{ cursor: "pointer" }}
                   className="table-light"
                   key={props.name + i}
                   onClick={props.onClick ? () => props.onClick(item) : null}

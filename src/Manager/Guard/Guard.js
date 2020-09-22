@@ -15,7 +15,7 @@ export default function Guard(props) {
 
   const headerInfo = {
     headers: [
-      "ID",
+      "Reference_ID",
       "Supervisor_ID",
       "Employees",
       "Location",
@@ -28,10 +28,18 @@ export default function Guard(props) {
   };
 
   const [state, setState] = useState({ logs: null, isLoading: true });
-  // const [referenceID, setReferenceID] = useState('');
+  const [referenceID, setReferenceID] = useState("");
   // useEffect(() => {
   //     // API.callLogAPI().then(x => setState({ logs: x, isLoading: false }))
   // }, [])
+  const handleSubmit = (e) => {
+    API.createLog({
+      id: auth.id,
+      floorpass_id: referenceID,
+      location: auth.location,
+    });
+    setReferenceID("");
+  };
 
   const LogSchema = Yup.object().shape({
     ReferenceID: Yup.string().required("required"),
@@ -40,14 +48,13 @@ export default function Guard(props) {
   return (
     <div>
       <General.Filter
-        logs={state.logs}
-        setLog={setState}
         headerInfo={headerInfo}
         showFilter={false}
+        onClick={(e) => setReferenceID(e.reference_id)}
       >
-        <Formik
+        {/* <Formik
           initialValues={{
-            ReferenceID: "",
+            ReferenceID: referenceID,
           }}
           validationSchema={LogSchema}
           onSubmit={(values, { resetForm }) => {
@@ -59,26 +66,32 @@ export default function Guard(props) {
             resetForm({});
           }}
         >
-          {({ values, errors, touched }) => (
-            <Form>
-              <div className="input-group input-group-sm mw-100 p-1 col-sm-12 col-md-3 col-lg-3">
-                <Field
-                  className="input-field form-control form-control-sm"
-                  name="ReferenceID"
-                  placeholder="Enter Reference ID"
-                />
-                <div className="input-group-append">
-                  <Button
-                    className="input-group-button button-sm"
-                    type="submit"
-                  >
-                    Log
-                  </Button>
-                </div>
-              </div>
-            </Form>
-          )}
-        </Formik>
+          {({ values, errors, touched }) => ( */}
+        {/* <Form> */}
+        <div className="input-group input-group-sm mw-100 p-1 col-sm-12 col-md-3 col-lg-3">
+          <input
+            className="input-field form-control form-control-sm"
+            name="ReferenceID"
+            placeholder="Enter Reference ID"
+            value={referenceID}
+            onChange={(e) => setReferenceID(e.target.value)}
+          />
+          <div className="input-group-append">
+            <Button
+              className="input-group-button button-sm"
+              // type="submit"
+              onClick={(e) => {
+                // e.preventDefault();
+                handleSubmit(e);
+              }}
+            >
+              Log
+            </Button>
+          </div>
+        </div>
+        {/* </Form> */}
+        {/* )}
+        </Formik> */}
       </General.Filter>
       {/* <Util.Log name="log" headerInfo={headerInfo} data={state} /> */}
     </div>

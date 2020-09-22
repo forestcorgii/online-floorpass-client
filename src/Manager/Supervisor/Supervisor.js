@@ -26,7 +26,7 @@ export default function Supervisor(props) {
   const data = useContext(DataContext);
   const headerInfo = {
     headers: [
-      "ID",
+      "Reference_ID",
       "Supervisor_ID",
       "Employees",
       "Location",
