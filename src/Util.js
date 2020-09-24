@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Table, Col, Modal, Button } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 
 function fillNumber(nm) {
   return nm < 10 ? "0" + nm : nm;
@@ -66,23 +66,23 @@ export function Select(props) {
       <select
         className="input-field custom-select custom-select-sm"
         name={props.name}
-        defaultValue={props.default}
+        // defaultValue={props.default}
         value={props.default}
         onChange={(e) => props.onChange(e)}
-        custom
+        custom="true"
       >
-        <option value=""></option>
+        {/* <option value=""></option> */}
         {props.options ? (
-          props.options.map((item) => {
+          props.options.map((item, i) => {
             return (
-              <option key={props.componentName + item.name} value={item.name}>
+              <option key={props.name + props.keyLoc + i} value={item.name}>
                 {item.name}
               </option>
             );
           })
         ) : (
-          <option value={"No " + props.name}>No {props.name}</option>
-        )}
+            <option value={"No " + props.name}>No {props.name}</option>
+          )}
       </select>
     </div>
   );
@@ -146,12 +146,12 @@ export function Log(props) {
                       <td key={props.name + i + j}>
                         {subHeader && item[header]
                           ? item[header].reverse().map((sItem, k) => {
-                              return (
-                                <p key={props.name + i + j + k}>
-                                  {sItem[subHeader]}
-                                </p>
-                              );
-                            })
+                            return (
+                              <p key={props.name + i + j + k}>
+                                {sItem[subHeader]}
+                              </p>
+                            );
+                          })
                           : item[header]}
                       </td>
                     );
@@ -162,8 +162,8 @@ export function Log(props) {
           </tbody>
         </table>
       ) : (
-        <p>loading...</p>
-      )}
+          <p>loading...</p>
+        )}
     </div>
   );
 }

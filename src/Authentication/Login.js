@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import * as RCBTRP from "react-bootstrap";
 import { Formik, Form } from "formik";
 
@@ -6,11 +6,11 @@ import * as Yup from "yup";
 import * as Schema from "../Validation/Yup/validationSchema";
 
 import Check from "../Formik-Bootstrap/Check";
-import InputGroup from "../Formik-Bootstrap/InputGroup";
+// import InputGroup from "../Formik-Bootstrap/InputGroup";
 import Select from "../Formik-Bootstrap/Select";
 import Text from "../Formik-Bootstrap/Text";
 
-import * as Util from "../Util";
+// import * as Util from "../Util";
 import * as API from "../Api/Api";
 import "../App.css";
 
@@ -24,6 +24,8 @@ function Authentication(props) {
   const data = useContext(DataContext);
   const [location, setLocation] = useState({});
   const [errormsg, setErrormsg] = useState("");
+
+
 
   return data.locations ? (
     <Formik
@@ -42,16 +44,31 @@ function Authentication(props) {
         location: Schema.basic,
       })}
       onSubmit={(values) => {
-        API.loginToHRMS(values.username, values.password)
-          .then((result) => {
-            return result.json();
-          })
-          .then((res) => {
-            // if (res.code === 0 && res.message.userpower > 0) {
-            if (res.code === 0) {
+        if (values.type === 'Supervisor') {
+          API.loginToHRMS(values.username, values.password)
+            .then((result) => {
+              return result.json();
+            })
+            .then((res) => {
+              // if (res.code === 0 && res.message.userpower > 0) {
+              if (res.code === 0) {
+                handleSubmit({
+                  id: res.message.username,
+                  name: res.message.fullname,
+                  ...values,
+                });
+                props.history.push(`/${values.type}`);
+              } else {
+                setErrormsg("You don't have the right to login.");
+              }
+            })
+            .catch((error) => alert(error));
+        } else {
+          API.loginAsGuard(values.username, values.password).then(res => res.json()).then(res => {
+            if (res.username) {
               handleSubmit({
-                id: res.message.username,
-                name: res.message.fullname,
+                id: res.username,
+                name: res.fullname,
                 ...values,
               });
               props.history.push(`/${values.type}`);
@@ -59,25 +76,26 @@ function Authentication(props) {
               setErrormsg("You don't have the right to login.");
             }
           })
-          .catch((error) => alert(error));
-      }}
+        }
+      }
+      }
     >
       {({ values, handleChange }) => (
         <div>
-          <RCBTRP.Card
+          <div className="card"
             style={{
-              width: "20rem",
-              padding: "15px",
+              width: "18rem",
+              padding: "10px",
               margin: "auto",
-              marginTop: "50px",
+              marginTop: "15px",
             }}
           >
             <Form>
-              <RCBTRP.Row>
-                <RCBTRP.Col>
-                  <img src={world} width="100%" height="auto" />
-                </RCBTRP.Col>
-              </RCBTRP.Row>
+              <div className="row">
+                <div className="col">
+                  <img src={world} alt="world" width="100%" height="auto" />
+                </div>
+              </div>
               {errormsg ? (
                 <div
                   className="alert alert-danger"
@@ -86,19 +104,19 @@ function Authentication(props) {
                   {errormsg}
                 </div>
               ) : null}
-              <RCBTRP.Row
-                className="justify-content-center mb-3"
+              <div
+                className="row justify-content-center mb-3"
                 style={{ marginTop: "15px" }}
               >
-                <RCBTRP.Col xs lg="4">
+                <div className="col">
                   <Check
                     type="radio"
                     name="type"
                     label="Supervisor"
                     value="Supervisor"
                   />
-                </RCBTRP.Col>
-                <RCBTRP.Col md="auto">
+                </div>
+                <div className="col md-auto">
                   <Check
                     type="radio"
                     name="type"
@@ -106,33 +124,34 @@ function Authentication(props) {
                     label="Guard"
                     value="Guard"
                   />
-                </RCBTRP.Col>
-              </RCBTRP.Row>
-              <RCBTRP.Row>
-                <RCBTRP.Col style={{ margin: "5px 0px" }}>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col col-5" style={{ margin: "5px 0px" }}>
                   <Text
                     className="uppercase"
-                    label="Username:"
+                    label="Username"
                     name="username"
                   />
-                </RCBTRP.Col>
-              </RCBTRP.Row>
-              <RCBTRP.Row>
-                <RCBTRP.Col style={{ margin: "5px 0px" }}>
+                </div>
+                {/* </div>
+              <div className="row"> */}
+                <div className="col col-7" style={{ margin: "5px 0px" }}>
                   <Text
                     className="uppercase"
-                    label="Password:"
+                    label="Password"
                     name="password"
                     type="password"
                   />
-                </RCBTRP.Col>
-              </RCBTRP.Row>
-              <RCBTRP.Row>
-                <RCBTRP.Col>
-                  <label>Location:</label>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col">
+                  <label>Location</label>
                   <Select
                     size="sm"
                     className="mb-1"
+                    keyLoc="login"
                     name="location"
                     label="Location"
                     onChange={(e) => {
@@ -143,39 +162,40 @@ function Authentication(props) {
                     }}
                     options={values.locations}
                   />
-                </RCBTRP.Col>
-              </RCBTRP.Row>
-              <RCBTRP.Row>
-                <RCBTRP.Col>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col">
                   {values.type === "Supervisor" ? (
                     <>
-                      <label>Department:</label>
+                      <label>Department</label>
                       <Select
                         size="sm"
-                        className="mb-1"
+                        className="mb-1 custom-select-sm"
+                        keyLoc="login"
                         name="department"
                         label="Department"
                         options={location ? location.departments : []}
                       />
                     </>
                   ) : null}
-                </RCBTRP.Col>
-              </RCBTRP.Row>
-              <RCBTRP.Row>
-                <RCBTRP.Col>
-                  <RCBTRP.Button size="sm" className="mt-3 w-100" type="submit">
+                </div>
+              </div>
+              <div className="row">
+                <div className="col">
+                  <button className="btn btn-sm mt-3 w-100 btn-primary" type="submit">
                     Login
-                  </RCBTRP.Button>
-                </RCBTRP.Col>
-              </RCBTRP.Row>
+                  </button>
+                </div>
+              </div>
             </Form>
-          </RCBTRP.Card>
+          </div>
         </div>
       )}
     </Formik>
   ) : (
-    <div>luding</div>
-  );
+      <div>luding</div>
+    );
 }
 
 export default Authentication;

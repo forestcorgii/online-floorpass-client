@@ -27,7 +27,7 @@ export default function Supervisor(props) {
   const headerInfo = {
     headers: [
       "Reference_ID",
-      "Supervisor_ID",
+      "Supervisor_Name",
       "Employees",
       "Location",
       "Department",
@@ -44,11 +44,15 @@ export default function Supervisor(props) {
     initialReferenceID
   );
 
-  const handleMakeFormSubmit = (e) => {
+  const handleMakeFormSubmit = async (e) => {
     setShowModalMakeID(false);
     if (e) {
-      API.createID(e);
+      API.createID(e).then(() => {
+
+      });
     }
+    // alert(JSON.stringify(initialReferenceID))
+    // alert(JSON.stringify(auth))
     setSelectedReferenceID(initialReferenceID);
   };
 
@@ -59,7 +63,7 @@ export default function Supervisor(props) {
         detail={{ ...selectedReferenceID, ...auth }}
         departments={data.departments}
         locations={data.locations}
-        onSubmit={(p) => handleMakeFormSubmit(p)}
+        onSubmit={(p) => { handleMakeFormSubmit(p) }}
       />
 
       <General.Filter
@@ -74,7 +78,11 @@ export default function Supervisor(props) {
         }}
       >
         <div className="mw-100 p-1 col-sm-12 col-md-3 col-lg-3">
-          <Button size="sm" onClick={() => setShowModalMakeID(true)}>
+          <Button size="sm" onClick={() => {
+            // alert(JSON.stringify(selectedReferenceID))
+            setSelectedReferenceID(initialReferenceID)
+            setShowModalMakeID(true)
+          }}>
             Generate ID
           </Button>
         </div>

@@ -1,6 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Button } from "react-bootstrap";
-import { Formik, Field, Form } from "formik";
+// import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 
 import * as Util from "../../Util";
@@ -27,30 +27,85 @@ export default function Guard(props) {
     subHeaders: { logs: "logdatetime_str", employees: "employee_name" },
   };
 
-  const [state, setState] = useState({ logs: null, isLoading: true });
-  const [referenceID, setReferenceID] = useState("");
+  // const [state, setState] = useState({ logs: null, isLoading: true });
+  const [floorpass, setFloorpass] = useState();
+  const [employeeID, setEmployeeID] = useState("")
+  const [showFloorpassDetail, setShowFloorpassDetail] = useState(false);
   // useEffect(() => {
   //     // API.callLogAPI().then(x => setState({ logs: x, isLoading: false }))
   // }, [])
-  const handleSubmit = (e) => {
+  const handleSubmit = () => {
     API.createLog({
       id: auth.id,
-      floorpass_id: referenceID,
+      floorpass_id: floorpass.reference_id,
       location: auth.location,
     });
-    setReferenceID("");
+    setFloorpass();
+    setEmployeeID("")
   };
 
-  const LogSchema = Yup.object().shape({
-    ReferenceID: Yup.string().required("required"),
-  });
+  useEffect(() => {
+    // alert('daan')
+    const timer = setTimeout(() => {
+      if (employeeID.length === 4) {
+        API.findLog(employeeID).then((res) => {
+          return res.json()
+        }).then((res) => {
+          if (res.id) {
+            setFloorpass(res)
+            // setShowFloorpassDetail(true)
+          }
+        })
+      }
+    }, 1000);
+    return () => clearTimeout(timer)
+  }, [employeeID, setFloorpass, setShowFloorpassDetail])
+
+
+  // const LogSchema = Yup.object().shape({
+  //   ReferenceID: Yup.string().required("required"),
+  // });
 
   return (
     <div>
+      <Util.ModalField
+        show={floorpass !== undefined}
+        header="Please verify floorpass:"
+        onExit={() => {
+          setFloorpass()
+          // setShowFloorpassDetail(false)
+        }}
+        onSubmit={() => handleSubmit()}
+      >
+        {floorpass ?
+          <>
+            <div className="row">
+              <div className="col">Reference ID:{floorpass.reference_id}</div>
+              <div className="col">Supervisor:{floorpass.supervisor_name}</div>
+            </div>
+            <hr></hr>
+            <div className="row">
+              <div className="col">Department:{floorpass.department}</div>
+              <div className="col">Location:{floorpass.location}</div>
+            </div>
+            <div className="row">
+              <div className="col">Purpose:</div>
+              <div className="col">{floorpass.purpose}</div>
+            </div>
+            <div className="row">
+              <div className="col">Employees included:</div>
+              {floorpass.employees.map((emp, i) => {
+                return <div className="col" key={"emps" + i}>{emp.employee_id} - {emp.employee_name}</div>
+              })}
+            </div>
+          </>
+          : null}
+
+      </Util.ModalField>
       <General.Filter
         headerInfo={headerInfo}
         showFilter={false}
-        onClick={(e) => setReferenceID(e.reference_id)}
+      // onClick={(e) => setReferenceID(e.reference_id)}
       >
         {/* <Formik
           initialValues={{
@@ -73,16 +128,17 @@ export default function Guard(props) {
             className="input-field form-control form-control-sm"
             name="ReferenceID"
             placeholder="Enter Reference ID"
-            value={referenceID}
-            onChange={(e) => setReferenceID(e.target.value)}
+            value={employeeID}
+            onChange={(e) => setEmployeeID(e.target.value)}
           />
           <div className="input-group-append">
             <Button
               className="input-group-button button-sm"
               // type="submit"
               onClick={(e) => {
+                // setShowFloorpassDetail(true)
                 // e.preventDefault();
-                handleSubmit(e);
+                // handleSubmit(e);
               }}
             >
               Log

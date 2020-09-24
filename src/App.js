@@ -14,7 +14,7 @@ const Authentication = lazy(() => import("./Authentication/Login"));
 
 function App(props) {
   const [auth, setAuth] = useState({});
-  const [departments, setDepartments] = useState();
+  // const [departments, setDepartments] = useState();
   const [locations, setLocations] = useState();
 
   const handleSubmit = (e) => {
@@ -22,15 +22,25 @@ function App(props) {
     setAuth(e);
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const oldAuth = JSON.parse(localStorage.getItem("auth"));
+      if (!oldAuth && auth.id) {
+        window.location.reload()
+      } else if (oldAuth && !auth.id) {
+        setAuth(oldAuth);
+      }
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [auth])
+
   const getList = async () => {
     await GetList("location").then((x) => {
-      console.log(x);
       setLocations(x);
     });
   };
 
   useEffect(() => {
-    // GetList("department").then((x) => setDepartments(x));
     getList();
     const oldAuth = JSON.parse(localStorage.getItem("auth"));
     if (oldAuth) {
@@ -48,10 +58,10 @@ function App(props) {
             {auth.type ? (
               <Redirect to={`/${auth.type}`} />
             ) : (
-              <Redirect to="/Login" />
-            )}
+                <Redirect to="/Login" />
+              )}
             <DataContext.Provider
-              value={{ departments: departments, locations: locations }}
+              value={{ locations: locations }}
             >
               <Route exact path="/Login" component={Authentication} />
               <Route exact path="/Supervisor" component={Supervisor} />

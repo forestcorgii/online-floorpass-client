@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Col, Row, Button, Alert } from "react-bootstrap";
+import { Col, Row, } from "react-bootstrap";
 import { Formik, Form, FieldArray } from "formik";
 import * as Yup from "yup";
 
@@ -11,6 +11,7 @@ import Select from "../../Formik-Bootstrap/Select";
 import Text from "../../Formik-Bootstrap/Text";
 
 import DataContext from "../../Contexts/DataContext";
+
 
 export default function MakeID({ detail, ...props }) {
   // alert(JSON.stringify(detail));
@@ -27,6 +28,8 @@ export default function MakeID({ detail, ...props }) {
   return (
     <Formik
       enableReinitialize
+      validateOnBlur="false"
+      validateOnChange="false"
       initialValues={{
         supervisorId: detail.id,
         supervisorName: detail.name,
@@ -45,7 +48,7 @@ export default function MakeID({ detail, ...props }) {
           .of(
             Yup.object().shape({
               employee_id: Yup.string()
-                .length(4, "ID must be 4 characters only")
+                .length(4, "ID must have 4 characters only")
                 .when("employee_name", {
                   is: (employee_name) => {
                     return !employee_name || employee_name === "";
@@ -54,32 +57,41 @@ export default function MakeID({ detail, ...props }) {
                 }),
             })
           )
+          .test("double-checking", "There should be atleast one Employee registered", (values) => {
+            return !(values.length === 1 && (values[0].employee_name === "" || values[0].employee_name === undefined))
+          })
           .test("duplicate-checking", "Duplicate Employee found", (values) => {
             const arr = [];
             let isUnique = true;
             values.forEach((val) => {
-              if (arr.filter((id) => id === val.employee_id).length >= 1) {
-                isUnique = false;
-              } else {
-                arr.push(val.employee_id);
+              if (val.employee_id !== "" && val.employee_id !== undefined) {
+                if (arr.filter((id) => id === val.employee_id).length >= 1) {
+                  isUnique = false;
+                } else {
+                  arr.push(val.employee_id);
+                }
               }
             });
             return isUnique;
           }),
       })}
+      onSubmit={(values, { resetForm }) => {
+        props.onSubmit(values);
+        resetForm({})
+      }}
     >
-      {({ values, isValid, handleChange, setFieldValue }) => (
+      {({ values, isValid, handleChange, handleSubmit, errors }) => (
         <Util.ModalField
           show={props.show}
           header="Generate New Reference ID"
           onExit={() => props.onSubmit()}
-          onSubmit={() => {
-            if (isValid) {
-              props.onSubmit(values);
-            }
-          }}
+          onSubmit={handleSubmit}
         >
           <Form>
+            {/* {JSON.stringify(errors)} */}
+            {errors.employees && typeof errors.employees === "string" ?
+              < div className="alert alert-danger">{errors.employees}</div>
+              : null}
             <Row className="m-1">
               <Col>
                 <Select
@@ -113,46 +125,31 @@ export default function MakeID({ detail, ...props }) {
             <hr></hr>
             <FieldArray
               name="employees"
-              // onChange={() => {
-              //   if (
-              //     values.employees[values.employees.length - 1]
-              //       .employee_name !== ""
-              //   ) {
-              //     alert("");
-              //     // setFieldValue("employees", [...values.employees, {}]);
-              //   }
-              // }}
             >
               {(arrayHelpers) => (
                 <>
                   {values.employees
                     ? values.employees.map((employee, index) => {
-                        return (
-                          <EmployeeItem
-                            key={index + "employeeitem"}
-                            employee={employee}
-                            index={index}
-                            arrayHelpers={arrayHelpers}
-                            handleChange={handleChange}
-                            employees={values.employees}
-                          />
-                        );
-                      })
+                      return (
+                        <EmployeeItem
+                          key={index + "employeeitem"}
+                          employee={employee}
+                          index={index}
+                          arrayHelpers={arrayHelpers}
+                          handleChange={handleChange}
+                          employees={values.employees}
+                        />
+                      );
+                    })
                     : console.log(values.employees)}
-                  {/* <EmployeeItem
-                    key={"newemployeeitem"}
-                    employee={{}}
-                    index={values.employees.length}
-                    arrayHelpers={arrayHelpers}
-                    handleChange={handleChange}
-                  /> */}
                 </>
               )}
             </FieldArray>
           </Form>
         </Util.ModalField>
-      )}
-    </Formik>
+      )
+      }
+    </Formik >
   );
 }
 
@@ -170,9 +167,25 @@ function EmployeeItem({
           className="uppercase"
           name={`employees[${index}].employee_id`}
           label={employee.employee_name}
+          placeholder='Enter Employee ID here please'
           normalButton="REMOVE"
           onButtonClick={() => {
-            arrayHelpers.remove(index);
+            if (
+              !(
+                employee.employee_id === "" ||
+                employee.employee_id === undefined
+              ) || employees.length > 1
+            ) {
+              arrayHelpers.remove(index);
+            }
+          }}
+          onBlur={() => {
+            if ((
+              employee.employee_id === "" ||
+              employee.employee_id === undefined) && employees.length > 2
+            ) {
+              arrayHelpers.remove(index);
+            }
           }}
           onChange={(e) => {
             if (e.target.value.length === 4) {

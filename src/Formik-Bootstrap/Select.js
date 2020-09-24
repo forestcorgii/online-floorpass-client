@@ -30,8 +30,8 @@ export default function Select({ options, label, ...props }) {
             );
           })
         ) : (
-          <option value={"No " + props.name}>No {props.name}</option>
-        )}
+            <option value={"No " + props.name}>No {props.name}</option>
+          )}
       </Form.Control>
       <Overlay target={target.current} show={isInvalid} placement="right">
         {(props) => (

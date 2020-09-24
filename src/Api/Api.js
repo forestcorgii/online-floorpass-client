@@ -17,17 +17,17 @@ export async function GetList(field) {
 export async function requestFilter(obj) {
   const response = await fetch(
     `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/filter/?username=` +
-      obj.username +
-      "&department=" +
-      (obj.department ? obj.department : "") +
-      "&location=" +
-      (obj.location ? obj.location : "") +
-      "&sort=" +
-      (obj.sort ? obj.sort : "-latest_log_date") +
-      "&limit=" +
-      (obj.limit ? obj.limit : "100") +
-      "&page=" +
-      (obj.limit ? obj.page : "1")
+    obj.username +
+    "&department=" +
+    (obj.department ? obj.department : "") +
+    "&location=" +
+    (obj.location ? obj.location : "") +
+    "&sort=" +
+    (obj.sort ? obj.sort : "-latest_log_date") +
+    "&limit=" +
+    (obj.limit ? obj.limit : "100") +
+    "&page=" +
+    (obj.limit ? obj.page : "1")
   );
 
   return await response.json();
@@ -118,7 +118,7 @@ export async function updateEmployee(obj, method) {
 
   // console.log(url)
 
-  const response = await fetch(url, requestOptions).catch((error) =>
+  await fetch(url, requestOptions).catch((error) =>
     console.log("error", error)
   );
 
@@ -149,6 +149,17 @@ export async function createLog(obj) {
   console.log(data);
   return data;
 }
+
+export async function findLog(id) {
+
+  var requestOptions = {
+    method: 'GET',
+    redirect: 'follow'
+  };
+
+  return await fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/findlog?id=${id}`, requestOptions)
+}
+
 
 export async function createID(obj) {
   var myHeaders = new Headers();
@@ -195,14 +206,13 @@ export async function checkNewLog(obj) {
   };
 
   return await fetch(
-    `http://localhost:8000/check_log/?username=` +
-      (obj.supervisor_id ? obj.supervisor_id : "") +
-      "&department=" +
-      (obj.department ? obj.department : "") +
-      "&location=" +
-      (obj.location ? obj.location : "") +
-      "&latest_log_date=" +
-      (obj.latest_log_date ? obj.latest_log_date : ""),
+    `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/check_log/?` +
+    "&department=" +
+    (obj.department ? obj.department : "") +
+    "&location=" +
+    (obj.location ? obj.location : "") +
+    "&latest_log_date=" +
+    (obj.latest_log_date ? obj.latest_log_date : ""),
     requestOptions
   ).then((response) => {
     return response.json();
@@ -224,4 +234,19 @@ export function loginToHRMS(username, password) {
     "http://idcsi-officesuites.com:8080/hrms/sso.php",
     requestOptions
   );
+}
+
+
+export function loginAsGuard(username, password) {
+  var formdata = new FormData();
+  formdata.append("username", "0000");
+  formdata.append("password", "temp@123");
+
+  var requestOptions = {
+    method: 'POST',
+    body: formdata,
+    redirect: 'follow'
+  };
+
+  return fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/guardlogin/`, requestOptions)
 }

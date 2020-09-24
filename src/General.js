@@ -1,13 +1,13 @@
 import React, { useContext, useState, useEffect, useReducer } from "react";
-import { Navbar, NavDropdown, Collapse, Button, Form } from "react-bootstrap";
+import { Navbar, NavDropdown, Form } from "react-bootstrap";
 
 import * as Util from "./Util";
 import * as API from "./Api/Api";
 
 import AuthContext from "./Contexts/AuthContext";
 import DataContext from "./Contexts/DataContext";
-import Select from "./Formik-Bootstrap/Select";
-import { findByLabelText } from "@testing-library/react";
+// import Select from "./Formik-Bootstrap/Select";
+// import { findByLabelText } from "@testing-library/react";
 
 function filterReducer(state, action) {
   switch (action.type) {
@@ -25,6 +25,8 @@ function filterReducer(state, action) {
         isLoading: false,
         latestLog: latestLog,
       };
+    default:
+      alert("unknown dispatch type.")
   }
 }
 
@@ -32,9 +34,11 @@ function Filter(props) {
   const { auth } = useContext(AuthContext);
   const data = useContext(DataContext);
   const [departments, setDepartments] = useState([]);
+  const [employee_id, setEmployee_id] = useState('');
 
   const [filter, dispatch] = useReducer(filterReducer, {
     ...auth,
+    username: '',
     page: 1,
     limit: 15,
   });
@@ -57,6 +61,15 @@ function Filter(props) {
     handleChange();
   }, []);
 
+
+  useEffect(() => {
+    // alert('daan')
+    const timer = setTimeout(() => {
+      handleChange({ username: employee_id })
+    }, 1000);
+    return () => clearTimeout(timer)
+  }, [employee_id])
+
   useEffect(() => {
     if (!props.isEditting) {
       const interval = setInterval(() => {
@@ -68,7 +81,7 @@ function Filter(props) {
       }, 5000);
       return () => clearInterval(interval);
     }
-  }, [filter]);
+  }, [filter, props.isEditting]);
 
   return (
     <div>
@@ -77,16 +90,17 @@ function Filter(props) {
           {props.children}
           {props.showFilter ? (
             <>
-              <div className="p-1 col-sm-1 col-md-1 col-lg-1">
-                <img />
+              <div className="p-1 col-sm-1 col-md-1 col-lg-1 text-right">
+                {/* <img alt /> */}
+                {/* <button className="btn btn-success btn-sm" >Refresh</button> */}
               </div>
               <Util.Text
                 className="p-1 col-sm-4 col-md-2 col-lg-2"
-                label="Supervisor ID"
+                label="Employee ID"
                 name="username"
-                value={filter.username}
+                value={employee_id}
                 onChange={(e) =>
-                  handleChange({ [e.target.name]: e.target.value })
+                  setEmployee_id(e.target.value)
                 }
               />
               <Util.Select
@@ -107,6 +121,7 @@ function Filter(props) {
               />
               <Util.Select
                 className="p-1 col-sm-7 col-md-3 col-lg-3 ml-md-auto ml-lg-auto"
+                keyLoc="filter"
                 label="Department"
                 name="department"
                 default={filter.department}
@@ -117,6 +132,7 @@ function Filter(props) {
               />
               <Util.Select
                 className="p-1 col-sm-7 col-md-3 col-lg-3 ml-md-auto ml-lg-auto"
+                keyLoc="filter"
                 label="Location"
                 name="location"
                 default={filter.location}
@@ -140,7 +156,6 @@ function Filter(props) {
             onClick={(e) => {
               if (props.onClick) {
                 props.onClick(e);
-                handleChange();
               }
             }}
           />
