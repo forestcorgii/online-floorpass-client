@@ -83,7 +83,7 @@ export default function Supervisor(props) {
             setSelectedReferenceID(initialReferenceID)
             setShowModalMakeID(true)
           }}>
-            Generate ID
+            Generate Floorpass
           </Button>
         </div>
       </General.Filter>

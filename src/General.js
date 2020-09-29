@@ -119,7 +119,7 @@ function Filter(props) {
                   handleChange({ [e.target.name]: e.target.value })
                 }
               />
-              <Util.Select
+              {/* <Util.Select
                 className="p-1 col-sm-7 col-md-3 col-lg-3 ml-md-auto ml-lg-auto"
                 keyLoc="filter"
                 label="Department"
@@ -144,7 +144,7 @@ function Filter(props) {
                   );
                   handleChange({ [e.target.name]: e.target.value });
                 }}
-              />
+              /> */}
             </>
           ) : null}
         </div>

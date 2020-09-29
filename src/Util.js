@@ -110,7 +110,7 @@ export function ModalField(props) {
             variant="primary"
             onClick={() => props.onSubmit()}
           >
-            Save Changes
+            Save
           </Button>
         </Modal.Footer>
       ) : null}

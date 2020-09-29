@@ -94,7 +94,7 @@ export default function MakeID({ detail, ...props }) {
               : null}
             <Row className="m-1">
               <Col>
-                <Select
+                <Select disabled
                   size="sm"
                   name="department"
                   label="Department"
@@ -102,7 +102,7 @@ export default function MakeID({ detail, ...props }) {
                 />
               </Col>
               <Col>
-                <Select
+                <Select disabled
                   size="sm"
                   name="location"
                   label="Location"
@@ -119,7 +119,8 @@ export default function MakeID({ detail, ...props }) {
             </Row>
             <Row className="m-1">
               <Col>
-                <Text size="sm" label="Purpose" name="purpose" as="textarea" />
+                <Text disabled={detail.status_label !== 'Stand By'}
+                  size="sm" label="Purpose" name="purpose" as="textarea" />
               </Col>
             </Row>
             <hr></hr>
@@ -132,6 +133,7 @@ export default function MakeID({ detail, ...props }) {
                     ? values.employees.map((employee, index) => {
                       return (
                         <EmployeeItem
+                          disabled={detail.status_label !== 'Stand By'}
                           key={index + "employeeitem"}
                           employee={employee}
                           index={index}
@@ -145,6 +147,9 @@ export default function MakeID({ detail, ...props }) {
                 </>
               )}
             </FieldArray>
+            <hr></hr>
+            {detail.status_label !== 'Stand By' ?
+              <div></div> : null}
           </Form>
         </Util.ModalField>
       )
@@ -159,11 +164,13 @@ function EmployeeItem({
   handleChange,
   arrayHelpers,
   employees,
+  disabled,
 }) {
   return (
     <Row className="m-2" key={index}>
       <Col>
         <InputGroup
+          disabled={disabled}
           className="uppercase"
           name={`employees[${index}].employee_id`}
           label={employee.employee_name}
