@@ -18,6 +18,8 @@ export async function requestFilter(obj) {
   const response = await fetch(
     `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/filter/?username=` +
     obj.username +
+    "&type=" +
+    (obj.type ? obj.type : "") +
     "&department=" +
     (obj.department ? obj.department : "") +
     "&location=" +
@@ -28,9 +30,9 @@ export async function requestFilter(obj) {
     (obj.limit ? obj.limit : "100") +
     "&page=" +
     (obj.limit ? obj.page : "1")
-  );
+  ).then((res) => { if (res.status === 200) { return res.json(); } alert(res.status) });
 
-  return await response.json();
+  return await response;
 }
 
 export async function FindName(id) {
@@ -204,15 +206,14 @@ export async function checkNewLog(obj) {
     method: "GET",
     redirect: "follow",
   };
-
   return await fetch(
     `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/check_log/?` +
-    "&department=" +
+    "department=" +
     (obj.department ? obj.department : "") +
     "&location=" +
     (obj.location ? obj.location : "") +
     "&latest_log_date=" +
-    (obj.latest_log_date ? obj.latest_log_date : ""),
+    (obj.logdatetime_str ? obj.logdatetime_str : ""),
     requestOptions
   ).then((response) => {
     return response.json();
@@ -249,4 +250,15 @@ export function loginAsGuard(username, password) {
   };
 
   return fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/guardlogin/`, requestOptions)
+}
+
+export async function getFloorpass(floorpass_id) {
+  var requestOptions = {
+    method: 'GET',
+    redirect: 'follow'
+  };
+
+  return fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/floorpass/${floorpass_id}/`, requestOptions)
+    .then(response => { if (response.status === 200) { return response.json() } alert(response.status) })
+
 }

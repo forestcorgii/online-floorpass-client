@@ -19,6 +19,10 @@ export default function MakeID({ detail, ...props }) {
   const [departments, setDepartments] = useState([]);
   const data = useContext(DataContext);
 
+  const edittable = () => {
+    return detail.status_label === 'Stand By' || detail.status_label === undefined
+  }
+
   useEffect(() => {
     setDepartments(
       detail.locations.find((e) => e.name === detail.location).departments
@@ -119,7 +123,7 @@ export default function MakeID({ detail, ...props }) {
             </Row>
             <Row className="m-1">
               <Col>
-                <Text disabled={detail.status_label !== 'Stand By'}
+                <Text disabled={edittable}
                   size="sm" label="Purpose" name="purpose" as="textarea" />
               </Col>
             </Row>
@@ -133,7 +137,7 @@ export default function MakeID({ detail, ...props }) {
                     ? values.employees.map((employee, index) => {
                       return (
                         <EmployeeItem
-                          disabled={detail.status_label !== 'Stand By'}
+                          disabled={edittable}
                           key={index + "employeeitem"}
                           employee={employee}
                           index={index}
@@ -148,8 +152,8 @@ export default function MakeID({ detail, ...props }) {
               )}
             </FieldArray>
             <hr></hr>
-            {detail.status_label !== 'Stand By' ?
-              <div></div> : null}
+            {detail.status_label !== 'Stand By' && (detail.report && detail.report.length > 0) ?
+              detail.report.map((des, i) => { return <div key={"rep" + i}>{des.from.loc} - {des.to.loc} : {des.elapse}</div> }) : null}
           </Form>
         </Util.ModalField>
       )

@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useReducer } from "react";
-import { Navbar, NavDropdown, Form } from "react-bootstrap";
+import { Navbar, NavDropdown, Form, Modal, Button } from "react-bootstrap";
 
 import * as Util from "./Util";
 import * as API from "./Api/Api";
@@ -63,7 +63,6 @@ function Filter(props) {
 
 
   useEffect(() => {
-    // alert('daan')
     const timer = setTimeout(() => {
       handleChange({ username: employee_id })
     }, 1000);
@@ -91,8 +90,6 @@ function Filter(props) {
           {props.showFilter ? (
             <>
               <div className="p-1 col-sm-1 col-md-1 col-lg-1 text-right">
-                {/* <img alt /> */}
-                {/* <button className="btn btn-success btn-sm" >Refresh</button> */}
               </div>
               <Util.Text
                 className="p-1 col-sm-4 col-md-2 col-lg-2"
@@ -119,40 +116,16 @@ function Filter(props) {
                   handleChange({ [e.target.name]: e.target.value })
                 }
               />
-              {/* <Util.Select
-                className="p-1 col-sm-7 col-md-3 col-lg-3 ml-md-auto ml-lg-auto"
-                keyLoc="filter"
-                label="Department"
-                name="department"
-                default={filter.department}
-                options={departments ? departments : []}
-                onChange={(e) =>
-                  handleChange({ [e.target.name]: e.target.value })
-                }
-              />
-              <Util.Select
-                className="p-1 col-sm-7 col-md-3 col-lg-3 ml-md-auto ml-lg-auto"
-                keyLoc="filter"
-                label="Location"
-                name="location"
-                default={filter.location}
-                options={data.locations}
-                onChange={(e) => {
-                  setDepartments(
-                    data.locations.find((el) => el.name === e.target.value)
-                      .departments
-                  );
-                  handleChange({ [e.target.name]: e.target.value });
-                }}
-              /> */}
+
             </>
           ) : null}
         </div>
         <div className="row m-1">
-          <Util.Log
+          <Log
             name="log"
             headerInfo={props.headerInfo}
             data={{ logs: filter.result, isLoading: false }}
+            type={auth.type}
             onClick={(e) => {
               if (props.onClick) {
                 props.onClick(e);
@@ -215,6 +188,118 @@ function Filter(props) {
     </div>
   );
 }
+
+function Log(props) {
+  const [floorpassDetail, setFloorpassDetail] = useState()
+  const [employeeDetail, setEmployeeDetail] = useState()
+
+  const handleFloorpassClick = (e) => {
+    API.getFloorpass(e.floorpass_id).then(res => { setFloorpassDetail(res) })
+  }
+
+  return (
+    <>
+      <Floorpass detail={floorpassDetail} show={floorpassDetail !== undefined} onExit={() => setFloorpassDetail()} />
+      <div className="table-responsive">
+        {!props.data.isLoading && props.data.logs && props.headerInfo ? (
+          <table className="table table-bordered">
+            <thead className="table-light">
+              <tr>
+                {[
+                  "Reference ID",
+                  "Employee",
+                  "Supervisor",
+                  "Location",
+                  "Department",
+                  "Time",
+                  "Purpose",
+                  "Status",
+                ].map((header) => {
+                  return <th key={props.name + header}>{header}</th>;
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {props.data.logs.map((item, i) => {
+                return (
+                  <tr
+                    className="table-light"
+                    key={props.name + i}
+                  // onClick={props.onClick ? () => props.onClick(item) : null}
+                  >
+                    <td>{props.type !== 'Supervisor' ? item.reference_id : <a href='#' onClick={() => { handleFloorpassClick(item) }} className='badge'>{item.reference_id}</a>}</td>
+                    <td>{props.type !== 'Supervisor' ? item.employee_id : <a href='#' className='badge'>{item.employee_id}</a>}</td>
+                    <td>{item.supervisor_id}</td>
+                    <td>{item.location}</td>
+                    <td>{item.department}</td>
+                    <td>{item.logdatetime_str}</td>
+                    <td>{item.purpose}</td>
+                    <td>{item.status}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        ) : (
+            <p>loading...</p>
+          )}
+      </div>
+    </>
+  );
+}
+
+function Floorpass({ detail, ...props }) {
+  return detail !== undefined ? <Modal show={props.show} onHide={() => props.onExit()}>
+    <Modal.Header>Reference ID: {detail.reference_id}</Modal.Header>
+    <Modal.Body>
+      {detail.reports && detail.reports.length > 0 ?
+        detail.reports.map((employee, i) => {
+          // if (employee.report.length > 0) {
+          return <div>
+            <div>{employee.employee}</div>
+            <hr></hr>
+            {employee.report.map((des, i) => { return <div key={"rep" + i}>{des.from.loc} - {des.to.loc} : {des.elapse}</div> })}
+            <hr></hr>
+          </div>
+          // }
+          // return alert(JSON.stringify(report))
+        })
+        : null}
+    </Modal.Body>
+    <Modal.Footer>
+      <Button
+        size="sm"
+        variant="primary"
+        onClick={() => {
+          props.onExit();
+        }}
+      >
+        Okay
+      </Button>
+    </Modal.Footer>
+  </Modal> : null
+
+}
+
+function Employee({ detail, ...props }) {
+  return <Modal show={props.show} onHide={() => props.onExit()}>
+    <Modal.Header>detail.employee_id</Modal.Header>
+    <Modal.Body>{JSON.stringify(detail)}</Modal.Body>
+    <Modal.Footer>
+      <Button
+        size="sm"
+        variant="primary"
+        onClick={() => {
+          props.onExit();
+        }}
+      >
+        Okay
+      </Button>
+    </Modal.Footer>
+  </Modal>
+}
+
+
 
 function Header(props) {
   const { auth } = useContext(AuthContext);
