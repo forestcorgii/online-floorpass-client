@@ -28,38 +28,40 @@ export default function Guard(props) {
   };
 
   // const [state, setState] = useState({ logs: null, isLoading: true });
-  const [floorpass, setFloorpass] = useState();
+  // const [floorpass, setFloorpass] = useState();
   const [employeeID, setEmployeeID] = useState("")
   const [showFloorpassDetail, setShowFloorpassDetail] = useState(false);
   // useEffect(() => {
   //     // API.callLogAPI().then(x => setState({ logs: x, isLoading: false }))
   // }, [])
-  const handleSubmit = () => {
+  const handleSubmit = (floorpass) => {
     API.createLog({
       id: auth.id,
       floorpass_id: floorpass.reference_id,
+      employee_id: employeeID,
       location: auth.location,
     });
-    setFloorpass();
+    // setFloorpass();
     setEmployeeID("")
+    alert("Log sent successfully!")
   };
 
   useEffect(() => {
     // alert('daan')
     const timer = setTimeout(() => {
       if (employeeID.length === 4) {
-        API.findLog(employeeID).then((res) => {
+        API.findLog(employeeID, auth.location).then((res) => {
           return res.json()
         }).then((res) => {
-          if (res.id) {
-            setFloorpass(res)
-            // setShowFloorpassDetail(true)
-          }
+          if (res.response === 'Allowed') {
+            // setFloorpass(res.floorpass)
+            handleSubmit(res.floorpass)
+          } else { alert(res.response); setEmployeeID("") }
         })
       }
     }, 1000);
     return () => clearTimeout(timer)
-  }, [employeeID, setFloorpass, setShowFloorpassDetail])
+  }, [employeeID, setShowFloorpassDetail])
 
 
   // const LogSchema = Yup.object().shape({
@@ -68,7 +70,7 @@ export default function Guard(props) {
 
   return (
     <div>
-      <Util.ModalField
+      {/* <Util.ModalField
         show={floorpass !== undefined}
         header="Please verify floorpass:"
         onExit={() => {
@@ -101,7 +103,7 @@ export default function Guard(props) {
           </>
           : null}
 
-      </Util.ModalField>
+      </Util.ModalField> */}
       <General.Filter
         headerInfo={headerInfo}
         showFilter={false}

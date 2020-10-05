@@ -134,6 +134,7 @@ export async function createLog(obj) {
   formdata.append("guard_id", obj.id);
   formdata.append("location", obj.location);
   formdata.append("floorpass", obj.floorpass_id);
+  formdata.append("employee_id", obj.employee_id);
 
   console.log(obj);
   var requestOptions = {
@@ -152,14 +153,14 @@ export async function createLog(obj) {
   return data;
 }
 
-export async function findLog(id) {
+export async function findLog(id, location) {
 
   var requestOptions = {
     method: 'GET',
     redirect: 'follow'
   };
 
-  return await fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/findlog?id=${id}`, requestOptions)
+  return await fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/findlog?id=${id}&location=${location}`, requestOptions)
 }
 
 
@@ -240,8 +241,8 @@ export function loginToHRMS(username, password) {
 
 export function loginAsGuard(username, password) {
   var formdata = new FormData();
-  formdata.append("username", "0000");
-  formdata.append("password", "temp@123");
+  formdata.append("username", username);
+  formdata.append("password", password);
 
   var requestOptions = {
     method: 'POST',
@@ -259,6 +260,17 @@ export async function getFloorpass(floorpass_id) {
   };
 
   return fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/floorpass/${floorpass_id}/`, requestOptions)
+    .then(response => { if (response.status === 200) { return response.json() } alert(response.status) })
+
+}
+
+export async function getEmployeeReport(obj) {
+  var requestOptions = {
+    method: 'GET',
+    redirect: 'follow'
+  };
+
+  return fetch(`http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/report/?id=${obj.employee_id}&datefrom=${obj.datefrom}`, requestOptions)
     .then(response => { if (response.status === 200) { return response.json() } alert(response.status) })
 
 }

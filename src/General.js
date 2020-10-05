@@ -196,17 +196,21 @@ function Log(props) {
   const handleFloorpassClick = (e) => {
     API.getFloorpass(e.floorpass_id).then(res => { setFloorpassDetail(res) })
   }
+  const handleEmployeeidClick = (e) => {
+    API.getEmployeeReport(e).then(res => { setEmployeeDetail(res) })
+  }
 
   return (
     <>
       <Floorpass detail={floorpassDetail} show={floorpassDetail !== undefined} onExit={() => setFloorpassDetail()} />
+      <Employee detail={employeeDetail} show={employeeDetail !== undefined} handleClick={(e) => handleEmployeeidClick(e)} onExit={() => setEmployeeDetail()} />
       <div className="table-responsive">
         {!props.data.isLoading && props.data.logs && props.headerInfo ? (
-          <table className="table table-bordered">
+          <table className="table table-bordered table-sm">
             <thead className="table-light">
               <tr>
                 {[
-                  "Reference ID",
+                  "Floorpass ID",
                   "Employee",
                   "Supervisor",
                   "Location",
@@ -228,7 +232,7 @@ function Log(props) {
                   // onClick={props.onClick ? () => props.onClick(item) : null}
                   >
                     <td>{props.type !== 'Supervisor' ? item.reference_id : <a href='#' onClick={() => { handleFloorpassClick(item) }} className='badge'>{item.reference_id}</a>}</td>
-                    <td>{props.type !== 'Supervisor' ? item.employee_id : <a href='#' className='badge'>{item.employee_id}</a>}</td>
+                    <td>{props.type !== 'Supervisor' ? item.employee_id : <a href='#' onClick={() => { handleEmployeeidClick({ employee_id: item.employee_id, datefrom: '' }) }} className='badge'>{item.employee_id}</a>}</td>
                     <td>{item.supervisor_id}</td>
                     <td>{item.location}</td>
                     <td>{item.department}</td>
@@ -250,19 +254,24 @@ function Log(props) {
 
 function Floorpass({ detail, ...props }) {
   return detail !== undefined ? <Modal show={props.show} onHide={() => props.onExit()}>
-    <Modal.Header>Reference ID: {detail.reference_id}</Modal.Header>
+    <Modal.Header>Floorpass ID: {detail.reference_id}</Modal.Header>
     <Modal.Body>
+      <div>Supervisor: {detail.supervisor_id}</div>
+      <div className="row">
+        <div className="col col-6">Department: {detail.department}</div>
+        <div className="col col-6">Location: {detail.location}</div>
+      </div>
+      <br />
       {detail.reports && detail.reports.length > 0 ?
         detail.reports.map((employee, i) => {
-          // if (employee.report.length > 0) {
-          return <div>
+          return <div className="table-responsive">
             <div>{employee.employee}</div>
-            <hr></hr>
-            {employee.report.map((des, i) => { return <div key={"rep" + i}>{des.from.loc} - {des.to.loc} : {des.elapse}</div> })}
-            <hr></hr>
+            <table className="table table-bordered table-sm">
+              <tr> <th>From</th><th>To</th><th>Elapse</th></tr>
+              {employee.report.map((des, i) => { return <tr key={"rep" + i}><td>{des.from.loc} </td><td>{des.to.loc}</td> <td>{des.elapse}</td> </tr> })}
+            </table>
+            {/* <hr /> */}
           </div>
-          // }
-          // return alert(JSON.stringify(report))
         })
         : null}
     </Modal.Body>
@@ -282,9 +291,29 @@ function Floorpass({ detail, ...props }) {
 }
 
 function Employee({ detail, ...props }) {
-  return <Modal show={props.show} onHide={() => props.onExit()}>
-    <Modal.Header>detail.employee_id</Modal.Header>
-    <Modal.Body>{JSON.stringify(detail)}</Modal.Body>
+  const [dateFrom, setDateFrom] = useState('')
+  useEffect(() => {
+    if (detail !== undefined) {
+      props.handleClick({ employee_id: detail.employee_id, datefrom: dateFrom })
+    }
+  }, [dateFrom])
+
+  return detail !== undefined ? <Modal show={props.show} onHide={() => props.onExit()}>
+    <Modal.Header><div>Employee ID: {detail.employee_id}</div><div><input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} /></div></Modal.Header>
+    <Modal.Body>
+      {detail.reports && detail.reports.length > 0 ?
+        detail.reports.map((floorpass, i) => {
+          return <div key={'flr' + i} className="table-responsive">
+            <div>{floorpass.reference_id}</div>
+            <table className="table table-bordered table-sm">
+              <tr> <th>From</th><th>To</th><th>Elapse</th></tr>
+              {floorpass.report.map((des, i) => { return <tr key={"rep" + i}><td>{des.from.loc} </td><td>{des.to.loc}</td> <td>{des.elapse}</td> </tr> })}
+            </table>
+            {/* <hr /> */}
+          </div>
+        })
+        : null}
+    </Modal.Body>
     <Modal.Footer>
       <Button
         size="sm"
@@ -296,22 +325,27 @@ function Employee({ detail, ...props }) {
         Okay
       </Button>
     </Modal.Footer>
-  </Modal>
+  </Modal> : null
 }
 
 
 
 function Header(props) {
   const { auth } = useContext(AuthContext);
-
   return (
     <Navbar variant="dark" bg="dark">
-      <Navbar.Brand>Online Floor Pass</Navbar.Brand>
+      <Navbar.Brand>Online Floorpass</Navbar.Brand>
+      {auth !== undefined && auth.type === "Supervisor" ?
+        <>
+          <button className="btn btn-outline-primary btn-sm m-1" >Logs</button>
+          <button className="btn btn-outline-primary  btn-sm m-1" >Floorpass</button>
+        </> : null}
       {props.children}
 
       {auth.username ? (
         <NavDropdown className="ml-auto" title={auth.name}>
           <NavDropdown.Item
+            size="sm"
             onClick={() => {
               localStorage.removeItem("auth");
               window.location.reload();
