@@ -25,7 +25,10 @@ export default function MyInputGroup({
   // console.log(typeof ButtonA);
   const toggle = toggleButton ? (
     <InputGroup.Append>
-      <ButtonA disabled={props.disabled} onClick={() => props.onToggle(!toggleButton.value)}>
+      <ButtonA
+        disabled={props.disabled}
+        onClick={() => props.onToggle(!toggleButton.value)}
+      >
         {buttonValue}
       </ButtonA>
     </InputGroup.Append>
@@ -33,7 +36,9 @@ export default function MyInputGroup({
 
   const normal = normalButton ? (
     <InputGroup.Append>
-      <Button disabled={props.disabled} onClick={() => props.onButtonClick()}>{normalButton}</Button>
+      <Button disabled={props.disabled} onClick={() => props.onButtonClick()}>
+        {normalButton}
+      </Button>
     </InputGroup.Append>
   ) : null;
   return (

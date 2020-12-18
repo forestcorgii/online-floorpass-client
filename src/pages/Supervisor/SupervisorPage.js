@@ -1,15 +1,13 @@
 import React, { useState, useContext } from "react";
 import { Button } from "react-bootstrap";
 
-import * as Util from "../../Util";
-import * as API from "../../Api/Api";
+import * as API from "./SupervisorAPI";
 import General from "../../General";
 
-import AuthContext from "../../Contexts/AuthContext";
-import DataContext from "../../Contexts/DataContext";
+import AuthContext from "../../contexts/AuthContext";
+import DataContext from "../../contexts/DataContext";
 
-import UpdateFloorpass from "./UpdateFloorpass";
-import MakeID from "./MakeID";
+import WriteFloorpass from "./WriteFloorpassForm";
 
 const initialReferenceID = {
   floorpassId: "",
@@ -47,9 +45,7 @@ export default function Supervisor(props) {
   const handleMakeFormSubmit = async (e) => {
     setShowModalMakeID(false);
     if (e) {
-      API.createID(e).then(() => {
-
-      });
+      API.createID(e).then(() => {});
     }
     // alert(JSON.stringify(initialReferenceID))
     // alert(JSON.stringify(auth))
@@ -58,12 +54,14 @@ export default function Supervisor(props) {
 
   return (
     <div>
-      <MakeID
+      <WriteFloorpass
         show={showModalMakeID}
         detail={{ ...selectedReferenceID, ...auth }}
         departments={data.departments}
         locations={data.locations}
-        onSubmit={(p) => { handleMakeFormSubmit(p) }}
+        onSubmit={(p) => {
+          handleMakeFormSubmit(p);
+        }}
       />
 
       <General.Filter
@@ -78,11 +76,14 @@ export default function Supervisor(props) {
         }}
       >
         <div className="mw-100 p-1 col-sm-12 col-md-3 col-lg-3">
-          <Button size="sm" onClick={() => {
-            // alert(JSON.stringify(selectedReferenceID))
-            setSelectedReferenceID(initialReferenceID)
-            setShowModalMakeID(true)
-          }}>
+          <Button
+            size="sm"
+            onClick={() => {
+              // alert(JSON.stringify(selectedReferenceID))
+              setSelectedReferenceID(initialReferenceID);
+              setShowModalMakeID(true);
+            }}
+          >
             Generate Floorpass
           </Button>
         </div>

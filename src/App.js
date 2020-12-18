@@ -2,15 +2,15 @@ import React, { lazy, Suspense, useState, useEffect } from "react";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import "./App.css";
-import AuthContext from "./Contexts/AuthContext";
-import DataContext from "./Contexts/DataContext";
+import AuthContext from "./contexts/AuthContext";
+import DataContext from "./contexts/DataContext";
 
 import General from "./General";
 import { GetList } from "./Api/Api";
 
-const Supervisor = lazy(() => import("./Manager/Supervisor/Supervisor"));
-const Guard = lazy(() => import("./Manager/Guard/Guard"));
-const Authentication = lazy(() => import("./Authentication/Login"));
+const Supervisor = lazy(() => import("./pages/Supervisor/SupervisorPage"));
+const Guard = lazy(() => import("./pages/Guard/GuardPage"));
+const Authentication = lazy(() => import("./pages/Login/LoginPage"));
 
 function App(props) {
   const [auth, setAuth] = useState({});
@@ -26,13 +26,13 @@ function App(props) {
     const interval = setInterval(() => {
       const oldAuth = JSON.parse(localStorage.getItem("auth"));
       if (!oldAuth && auth.id) {
-        window.location.reload()
+        window.location.reload();
       } else if (oldAuth && !auth.id) {
         setAuth(oldAuth);
       }
     }, 10000);
     return () => clearInterval(interval);
-  }, [auth])
+  }, [auth]);
 
   const getList = async () => {
     await GetList("location").then((x) => {
@@ -58,11 +58,9 @@ function App(props) {
             {auth.type ? (
               <Redirect to={`/${auth.type}`} />
             ) : (
-                <Redirect to="/Login" />
-              )}
-            <DataContext.Provider
-              value={{ locations: locations }}
-            >
+              <Redirect to="/Login" />
+            )}
+            <DataContext.Provider value={{ locations: locations }}>
               <Route exact path="/Login" component={Authentication} />
               <Route exact path="/Supervisor" component={Supervisor} />
               <Route exact path="/Guard" component={Guard} />

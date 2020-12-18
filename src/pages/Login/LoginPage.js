@@ -1,31 +1,61 @@
 import React, { useContext, useState } from "react";
-import * as RCBTRP from "react-bootstrap";
 import { Formik, Form } from "formik";
 
-import * as Yup from "yup";
-import * as Schema from "../Validation/Yup/validationSchema";
+import Check from "../../components/Formik/Check";
+import Select from "../../components/Formik/Select";
+import Text from "../../components/Common/Text";
 
-import Check from "../Formik-Bootstrap/Check";
-// import InputGroup from "../Formik-Bootstrap/InputGroup";
-import Select from "../Formik-Bootstrap/Select";
-import Text from "../Formik-Bootstrap/Text";
+import * as API from "./LoginAPI";
+import "../../App.css";
 
-// import * as Util from "../Util";
-import * as API from "../Api/Api";
-import "../App.css";
+import AuthContext from "../../contexts/AuthContext";
+import DataContext from "../../contexts/DataContext";
 
-import AuthContext from "../Contexts/AuthContext";
-import DataContext from "../Contexts/DataContext";
+import Validation from "./LoginValidation";
 
-import world from "../world.png";
-
-function Authentication(props) {
+export default function Login(props) {
   const { handleSubmit } = useContext(AuthContext);
   const data = useContext(DataContext);
   const [location, setLocation] = useState({});
   const [errormsg, setErrormsg] = useState("");
 
-
+  const handleLoginSubmit = (values) => {
+    if (values.type === "Supervisor") {
+      API.loginToHRMS(values.username, values.password)
+        .then((result) => {
+          return result.json();
+        })
+        .then((res) => {
+          // if (res.code === 0 && res.message.userpower > 0) {
+          if (res.code === 0) {
+            handleSubmit({
+              id: res.message.username,
+              name: res.message.fullname,
+              ...values,
+            });
+            props.history.push(`/${values.type}`);
+          } else {
+            setErrormsg("You don't have the right to login.");
+          }
+        })
+        .catch((error) => alert(error));
+    } else {
+      API.loginAsGuard(values.username, values.password)
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.username) {
+            handleSubmit({
+              id: res.username,
+              name: res.fullname,
+              ...values,
+            });
+            props.history.push(`/${values.type}`);
+          } else {
+            setErrormsg("You don't have the right to login.");
+          }
+        });
+    }
+  };
 
   return data.locations ? (
     <Formik
@@ -38,51 +68,13 @@ function Authentication(props) {
         location: "",
         locations: [...data.locations],
       }}
-      validationSchema={Yup.object().shape({
-        username: Schema.basic,
-        password: Schema.basic,
-        location: Schema.basic,
-      })}
-      onSubmit={(values) => {
-        if (values.type === 'Supervisor') {
-          API.loginToHRMS(values.username, values.password)
-            .then((result) => {
-              return result.json();
-            })
-            .then((res) => {
-              // if (res.code === 0 && res.message.userpower > 0) {
-              if (res.code === 0) {
-                handleSubmit({
-                  id: res.message.username,
-                  name: res.message.fullname,
-                  ...values,
-                });
-                props.history.push(`/${values.type}`);
-              } else {
-                setErrormsg("You don't have the right to login.");
-              }
-            })
-            .catch((error) => alert(error));
-        } else {
-          API.loginAsGuard(values.username, values.password).then(res => res.json()).then(res => {
-            if (res.username) {
-              handleSubmit({
-                id: res.username,
-                name: res.fullname,
-                ...values,
-              });
-              props.history.push(`/${values.type}`);
-            } else {
-              setErrormsg("You don't have the right to login.");
-            }
-          })
-        }
-      }
-      }
+      validationSchema={Validation.Schema}
+      onSubmit={handleLoginSubmit}
     >
       {({ values, handleChange }) => (
         <div>
-          <div className="card"
+          <div
+            className="card"
             style={{
               width: "18rem",
               padding: "10px",
@@ -93,7 +85,7 @@ function Authentication(props) {
             <Form>
               <div className="row">
                 <div className="col">
-                  <img src={world} alt="world" width="100%" height="auto" />
+                  <img alt="world" width="100%" height="auto" />
                 </div>
               </div>
               {errormsg ? (
@@ -183,7 +175,10 @@ function Authentication(props) {
               </div>
               <div className="row">
                 <div className="col">
-                  <button className="btn btn-sm mt-3 w-100 btn-primary" type="submit">
+                  <button
+                    className="btn btn-sm mt-3 w-100 btn-primary"
+                    type="submit"
+                  >
                     Login
                   </button>
                 </div>
@@ -194,8 +189,6 @@ function Authentication(props) {
       )}
     </Formik>
   ) : (
-      <div>luding</div>
-    );
+    <div>luding</div>
+  );
 }
-
-export default Authentication;

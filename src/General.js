@@ -1,11 +1,12 @@
 import React, { useContext, useState, useEffect, useReducer } from "react";
 import { Navbar, NavDropdown, Form, Modal, Button } from "react-bootstrap";
 
-import * as Util from "./Util";
 import * as API from "./Api/Api";
+import CommonSelect from "./components/Common/Select";
+import CommonText from "./components/Common/Text";
 
-import AuthContext from "./Contexts/AuthContext";
-import DataContext from "./Contexts/DataContext";
+import AuthContext from "./contexts/AuthContext";
+import DataContext from "./contexts/DataContext";
 // import Select from "./Formik-Bootstrap/Select";
 // import { findByLabelText } from "@testing-library/react";
 
@@ -26,7 +27,7 @@ function filterReducer(state, action) {
         latestLog: latestLog,
       };
     default:
-      alert("unknown dispatch type.")
+      alert("unknown dispatch type.");
   }
 }
 
@@ -34,11 +35,11 @@ function Filter(props) {
   const { auth } = useContext(AuthContext);
   const data = useContext(DataContext);
   const [departments, setDepartments] = useState([]);
-  const [employee_id, setEmployee_id] = useState('');
+  const [employee_id, setEmployee_id] = useState("");
 
   const [filter, dispatch] = useReducer(filterReducer, {
     ...auth,
-    username: '',
+    username: "",
     page: 1,
     limit: 15,
   });
@@ -61,13 +62,12 @@ function Filter(props) {
     handleChange();
   }, []);
 
-
   useEffect(() => {
     const timer = setTimeout(() => {
-      handleChange({ username: employee_id })
+      handleChange({ username: employee_id });
     }, 1000);
-    return () => clearTimeout(timer)
-  }, [employee_id])
+    return () => clearTimeout(timer);
+  }, [employee_id]);
 
   useEffect(() => {
     if (!props.isEditting) {
@@ -89,18 +89,15 @@ function Filter(props) {
           {props.children}
           {props.showFilter ? (
             <>
-              <div className="p-1 col-sm-1 col-md-1 col-lg-1 text-right">
-              </div>
-              <Util.Text
+              <div className="p-1 col-sm-1 col-md-1 col-lg-1 text-right"></div>
+              <CommonText
                 className="p-1 col-sm-4 col-md-2 col-lg-2"
                 label="Employee ID"
                 name="username"
                 value={employee_id}
-                onChange={(e) =>
-                  setEmployee_id(e.target.value)
-                }
+                onChange={(e) => setEmployee_id(e.target.value)}
               />
-              <Util.Select
+              <CommonSelect
                 className="p-1 col-sm-2 col-md-2 col-lg-2"
                 label="Limit"
                 name="limit"
@@ -116,7 +113,6 @@ function Filter(props) {
                   handleChange({ [e.target.name]: e.target.value })
                 }
               />
-
             </>
           ) : null}
         </div>
@@ -190,20 +186,33 @@ function Filter(props) {
 }
 
 function Log(props) {
-  const [floorpassDetail, setFloorpassDetail] = useState()
-  const [employeeDetail, setEmployeeDetail] = useState()
+  const [floorpassDetail, setFloorpassDetail] = useState();
+  const [employeeDetail, setEmployeeDetail] = useState();
 
   const handleFloorpassClick = (e) => {
-    API.getFloorpass(e.floorpass_id).then(res => { setFloorpassDetail(res) })
-  }
+    API.getFloorpass(e.floorpass_id).then((res) => {
+      setFloorpassDetail(res);
+    });
+  };
   const handleEmployeeidClick = (e) => {
-    API.getEmployeeReport(e).then(res => { setEmployeeDetail(res) })
-  }
+    API.getEmployeeReport(e).then((res) => {
+      setEmployeeDetail(res);
+    });
+  };
 
   return (
     <>
-      <Floorpass detail={floorpassDetail} show={floorpassDetail !== undefined} onExit={() => setFloorpassDetail()} />
-      <Employee detail={employeeDetail} show={employeeDetail !== undefined} handleClick={(e) => handleEmployeeidClick(e)} onExit={() => setEmployeeDetail()} />
+      <Floorpass
+        detail={floorpassDetail}
+        show={floorpassDetail !== undefined}
+        onExit={() => setFloorpassDetail()}
+      />
+      <Employee
+        detail={employeeDetail}
+        show={employeeDetail !== undefined}
+        handleClick={(e) => handleEmployeeidClick(e)}
+        onExit={() => setEmployeeDetail()}
+      />
       <div className="table-responsive">
         {!props.data.isLoading && props.data.logs && props.headerInfo ? (
           <table className="table table-bordered table-sm">
@@ -229,10 +238,41 @@ function Log(props) {
                   <tr
                     className="table-light"
                     key={props.name + i}
-                  // onClick={props.onClick ? () => props.onClick(item) : null}
+                    // onClick={props.onClick ? () => props.onClick(item) : null}
                   >
-                    <td>{props.type !== 'Supervisor' ? item.reference_id : <a href='#' onClick={() => { handleFloorpassClick(item) }} className='badge'>{item.reference_id}</a>}</td>
-                    <td>{props.type !== 'Supervisor' ? item.employee_id : <a href='#' onClick={() => { handleEmployeeidClick({ employee_id: item.employee_id, datefrom: '' }) }} className='badge'>{item.employee_id}</a>}</td>
+                    <td>
+                      {props.type !== "Supervisor" ? (
+                        item.reference_id
+                      ) : (
+                        <a
+                          href="#"
+                          onClick={() => {
+                            handleFloorpassClick(item);
+                          }}
+                          className="badge"
+                        >
+                          {item.reference_id}
+                        </a>
+                      )}
+                    </td>
+                    <td>
+                      {props.type !== "Supervisor" ? (
+                        item.employee_id
+                      ) : (
+                        <a
+                          href="#"
+                          onClick={() => {
+                            handleEmployeeidClick({
+                              employee_id: item.employee_id,
+                              datefrom: "",
+                            });
+                          }}
+                          className="badge"
+                        >
+                          {item.employee_id}
+                        </a>
+                      )}
+                    </td>
                     <td>{item.supervisor_id}</td>
                     <td>{item.location}</td>
                     <td>{item.department}</td>
@@ -245,101 +285,145 @@ function Log(props) {
             </tbody>
           </table>
         ) : (
-            <p>loading...</p>
-          )}
+          <p>loading...</p>
+        )}
       </div>
     </>
   );
 }
 
 function Floorpass({ detail, ...props }) {
-  return detail !== undefined ? <Modal show={props.show} onHide={() => props.onExit()}>
-    <Modal.Header>Floorpass ID: {detail.reference_id}</Modal.Header>
-    <Modal.Body>
-      <div>Supervisor: {detail.supervisor_id}</div>
-      <div className="row">
-        <div className="col col-6">Department: {detail.department}</div>
-        <div className="col col-6">Location: {detail.location}</div>
-      </div>
-      <br />
-      {detail.reports && detail.reports.length > 0 ?
-        detail.reports.map((employee, i) => {
-          return <div className="table-responsive">
-            <div>{employee.employee}</div>
-            <table className="table table-bordered table-sm">
-              <tr> <th>From</th><th>To</th><th>Elapse</th></tr>
-              {employee.report.map((des, i) => { return <tr key={"rep" + i}><td>{des.from.loc} </td><td>{des.to.loc}</td> <td>{des.elapse}</td> </tr> })}
-            </table>
-            {/* <hr /> */}
-          </div>
-        })
-        : null}
-    </Modal.Body>
-    <Modal.Footer>
-      <Button
-        size="sm"
-        variant="primary"
-        onClick={() => {
-          props.onExit();
-        }}
-      >
-        Okay
-      </Button>
-    </Modal.Footer>
-  </Modal> : null
-
+  return detail !== undefined ? (
+    <Modal show={props.show} onHide={() => props.onExit()}>
+      <Modal.Header>Floorpass ID: {detail.reference_id}</Modal.Header>
+      <Modal.Body>
+        <div>Supervisor: {detail.supervisor_id}</div>
+        <div className="row">
+          <div className="col col-6">Department: {detail.department}</div>
+          <div className="col col-6">Location: {detail.location}</div>
+        </div>
+        <br />
+        {detail.reports && detail.reports.length > 0
+          ? detail.reports.map((employee, i) => {
+              return (
+                <div className="table-responsive">
+                  <div>{employee.employee}</div>
+                  <table className="table table-bordered table-sm">
+                    <tr>
+                      {" "}
+                      <th>From</th>
+                      <th>To</th>
+                      <th>Elapse</th>
+                    </tr>
+                    {employee.report.map((des, i) => {
+                      return (
+                        <tr key={"rep" + i}>
+                          <td>{des.from.loc} </td>
+                          <td>{des.to.loc}</td> <td>{des.elapse}</td>{" "}
+                        </tr>
+                      );
+                    })}
+                  </table>
+                  {/* <hr /> */}
+                </div>
+              );
+            })
+          : null}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          size="sm"
+          variant="primary"
+          onClick={() => {
+            props.onExit();
+          }}
+        >
+          Okay
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  ) : null;
 }
 
 function Employee({ detail, ...props }) {
-  const [dateFrom, setDateFrom] = useState('')
+  const [dateFrom, setDateFrom] = useState("");
   useEffect(() => {
     if (detail !== undefined) {
-      props.handleClick({ employee_id: detail.employee_id, datefrom: dateFrom })
+      props.handleClick({
+        employee_id: detail.employee_id,
+        datefrom: dateFrom,
+      });
     }
-  }, [dateFrom])
+  }, [dateFrom]);
 
-  return detail !== undefined ? <Modal show={props.show} onHide={() => props.onExit()}>
-    <Modal.Header><div>Employee ID: {detail.employee_id}</div><div><input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} /></div></Modal.Header>
-    <Modal.Body>
-      {detail.reports && detail.reports.length > 0 ?
-        detail.reports.map((floorpass, i) => {
-          return <div key={'flr' + i} className="table-responsive">
-            <div>{floorpass.reference_id}</div>
-            <table className="table table-bordered table-sm">
-              <tr> <th>From</th><th>To</th><th>Elapse</th></tr>
-              {floorpass.report.map((des, i) => { return <tr key={"rep" + i}><td>{des.from.loc} </td><td>{des.to.loc}</td> <td>{des.elapse}</td> </tr> })}
-            </table>
-            {/* <hr /> */}
-          </div>
-        })
-        : null}
-    </Modal.Body>
-    <Modal.Footer>
-      <Button
-        size="sm"
-        variant="primary"
-        onClick={() => {
-          props.onExit();
-        }}
-      >
-        Okay
-      </Button>
-    </Modal.Footer>
-  </Modal> : null
+  return detail !== undefined ? (
+    <Modal show={props.show} onHide={() => props.onExit()}>
+      <Modal.Header>
+        <div>Employee ID: {detail.employee_id}</div>
+        <div>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+          />
+        </div>
+      </Modal.Header>
+      <Modal.Body>
+        {detail.reports && detail.reports.length > 0
+          ? detail.reports.map((floorpass, i) => {
+              return (
+                <div key={"flr" + i} className="table-responsive">
+                  <div>{floorpass.reference_id}</div>
+                  <table className="table table-bordered table-sm">
+                    <tr>
+                      {" "}
+                      <th>From</th>
+                      <th>To</th>
+                      <th>Elapse</th>
+                    </tr>
+                    {floorpass.report.map((des, i) => {
+                      return (
+                        <tr key={"rep" + i}>
+                          <td>{des.from.loc} </td>
+                          <td>{des.to.loc}</td> <td>{des.elapse}</td>{" "}
+                        </tr>
+                      );
+                    })}
+                  </table>
+                  {/* <hr /> */}
+                </div>
+              );
+            })
+          : null}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          size="sm"
+          variant="primary"
+          onClick={() => {
+            props.onExit();
+          }}
+        >
+          Okay
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  ) : null;
 }
-
-
 
 function Header(props) {
   const { auth } = useContext(AuthContext);
   return (
     <Navbar variant="dark" bg="dark">
       <Navbar.Brand>Online Floorpass</Navbar.Brand>
-      {auth !== undefined && auth.type === "Supervisor" ?
+      {auth !== undefined && auth.type === "Supervisor" ? (
         <>
-          <button className="btn btn-outline-primary btn-sm m-1" >Logs</button>
-          <button className="btn btn-outline-primary  btn-sm m-1" >Floorpass</button>
-        </> : null}
+          <button className="btn btn-outline-primary btn-sm m-1">Logs</button>
+          <button className="btn btn-outline-primary  btn-sm m-1">
+            Floorpass
+          </button>
+        </>
+      ) : null}
       {props.children}
 
       {auth.username ? (

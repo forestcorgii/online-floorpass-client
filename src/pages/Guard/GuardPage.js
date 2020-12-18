@@ -1,14 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Button } from "react-bootstrap";
-// import { Formik, Field, Form } from "formik";
-import * as Yup from "yup";
-
-import * as Util from "../../Util";
-import * as API from "../../Api/Api";
+import * as API from "./GuardAPI";
 import General from "../../General";
 
-import AuthContext from "../../Contexts/AuthContext";
-// import DataContext from './DataContext';
+import AuthContext from "../../contexts/AuthContext";
 
 export default function Guard(props) {
   const { auth } = useContext(AuthContext);
@@ -29,7 +24,7 @@ export default function Guard(props) {
 
   // const [state, setState] = useState({ logs: null, isLoading: true });
   // const [floorpass, setFloorpass] = useState();
-  const [employeeID, setEmployeeID] = useState("")
+  const [employeeID, setEmployeeID] = useState("");
   const [showFloorpassDetail, setShowFloorpassDetail] = useState(false);
   // useEffect(() => {
   //     // API.callLogAPI().then(x => setState({ logs: x, isLoading: false }))
@@ -42,27 +37,31 @@ export default function Guard(props) {
       location: auth.location,
     });
     // setFloorpass();
-    setEmployeeID("")
-    alert("Log sent successfully!")
+    setEmployeeID("");
+    alert("Log sent successfully!");
   };
 
   useEffect(() => {
     // alert('daan')
     const timer = setTimeout(() => {
       if (employeeID.length === 4) {
-        API.findLog(employeeID, auth.location).then((res) => {
-          return res.json()
-        }).then((res) => {
-          if (res.response === 'Allowed') {
-            // setFloorpass(res.floorpass)
-            handleSubmit(res.floorpass)
-          } else { alert(res.response); setEmployeeID("") }
-        })
+        API.findLog(employeeID, auth.location)
+          .then((res) => {
+            return res.json();
+          })
+          .then((res) => {
+            if (res.response === "Allowed") {
+              // setFloorpass(res.floorpass)
+              handleSubmit(res.floorpass);
+            } else {
+              alert(res.response);
+              setEmployeeID("");
+            }
+          });
       }
     }, 1000);
-    return () => clearTimeout(timer)
-  }, [employeeID, setShowFloorpassDetail])
-
+    return () => clearTimeout(timer);
+  }, [employeeID, setShowFloorpassDetail]);
 
   // const LogSchema = Yup.object().shape({
   //   ReferenceID: Yup.string().required("required"),
@@ -107,7 +106,7 @@ export default function Guard(props) {
       <General.Filter
         headerInfo={headerInfo}
         showFilter={false}
-      // onClick={(e) => setReferenceID(e.reference_id)}
+        // onClick={(e) => setReferenceID(e.reference_id)}
       >
         {/* <Formik
           initialValues={{
